@@ -297,33 +297,12 @@ body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);dis
     <div class="slabel" style="padding-top:12px;">Connect Oura Ring</div>
     <div class="oura-setup">
       <div class="oura-hint">
-        <strong>Option A — Manual (works now):</strong><br>
-        Open your Oura app → check today's stats → enter them below.<br><br>
-        <strong>Option B — Auto sync (recommended):</strong><br>
-        Paste your token from <a href="https://cloud.ouraring.com/personal-access-tokens" target="_blank">cloud.ouraring.com/personal-access-tokens</a> and tap Fetch. This requires the app to be hosted on a server — see the setup guide below.
+        Paste your Oura token below and tap <strong>Fetch</strong> — your data loads automatically. 🌊<br><br>
+        Get your token at <a href="https://cloud.ouraring.com/personal-access-tokens" target="_blank">cloud.ouraring.com/personal-access-tokens</a> → Create New Personal Access Token.
       </div>
-      <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:12px;" id="manual-oura-fields">
-        ${[["HRV (ms)","m-hrv"],["Temp deviation","m-temp"],["Sleep score","m-sleep"],["Readiness","m-ready"],["Resting HR","m-rhr"],["Steps","m-steps"]].map(([l,id])=>`
-          <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">${l}</div>
-          <input id="${id}" class="line-input" style="font-size:14px;padding:9px 10px;" placeholder="--" type="number"></div>`).join("")}
-      </div>
-      <button class="add-btn" style="width:100%;margin-top:10px;" onclick="applyManualOura()">Apply my Oura data</button>
-      <div style="border-top:1px solid var(--border);margin-top:14px;padding-top:14px;">
-        <div style="font-size:11px;font-weight:500;color:var(--text-mid);margin-bottom:6px;">Auto-sync token (optional)</div>
-        <input class="settings-input" id="oura-token" type="password" placeholder="Paste Oura token here..." oninput="saveOuraToken()" style="margin-top:0;">
-        <button class="oura-fetch-btn" onclick="fetchOura()" style="margin-top:8px;">Try auto-fetch</button>
-        <div class="oura-note" id="oura-status" style="margin-top:6px;"></div>
-      </div>
-    </div>
-    <div class="slabel" style="padding-top:12px;">Make auto-sync work — free hosting guide</div>
-    <div class="card" style="margin-top:0;background:var(--cream);">
-      <div style="font-size:12px;color:var(--text-muted);line-height:1.8;">
-        To make Oura auto-sync work permanently on your phone, host Onda on Vercel (free, 5 mins):<br><br>
-        1. Go to <a href="https://vercel.com" target="_blank" style="color:var(--blush-dark);">vercel.com</a> → sign up free with Google<br>
-        2. Ask me: <em>"Help me deploy Onda to Vercel"</em> in this chat — I'll walk you through every step<br>
-        3. Once deployed, your app gets a real URL like <code style="font-size:11px;background:var(--cream-mid);padding:1px 4px;border-radius:4px;">onda.vercel.app</code><br>
-        4. Add that URL to your home screen — Oura will connect automatically every time 🌊
-      </div>
+      <input class="settings-input" id="oura-token" type="password" placeholder="Paste Oura token here..." oninput="saveOuraToken()">
+      <button class="oura-fetch-btn" onclick="fetchOura()" style="margin-top:8px;">Fetch today's data</button>
+      <div class="oura-note" id="oura-status" style="margin-top:6px;"></div>
     </div>
     <div class="slabel" style="padding-top:12px;">Why this matters in pregnancy</div>
     <div class="card" style="margin-top:0;">
@@ -815,23 +794,7 @@ async function fetchOuraViaAllOrigins(token,yesterday,today){
   }
 }
 
-function showOuraManualEntry(){
-  const statusEl=document.getElementById("oura-status");
-  statusEl.innerHTML=`
-    <div style="font-size:12px;color:var(--text-mid);line-height:1.6;margin-top:4px;">
-      <strong>Browser security is blocking the Oura connection.</strong><br><br>
-      This is a known limitation of local HTML files — the Oura API requires a server to proxy requests.<br><br>
-      <strong>Workaround — enter today's values manually:</strong>
-    </div>
-    <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-top:10px;">
-      ${[["HRV (ms)","m-hrv"],["Temp deviation","m-temp"],["Sleep score","m-sleep"],["Readiness","m-ready"],["Resting HR","m-rhr"],["Steps","m-steps"]].map(([l,id])=>`
-        <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:3px;">${l}</div>
-        <input id="${id}" class="line-input" style="font-size:13px;padding:8px 10px;" placeholder="--" type="number"></div>`).join("")}
-    </div>
-    <button class="add-btn" style="width:100%;margin-top:10px;" onclick="applyManualOura()">Apply my data</button>
-    <div style="font-size:11px;color:var(--text-muted);margin-top:8px;">Open your Oura app to find these values, then enter them here. They'll display in your Onda dashboard.</div>
-  `;
-}
+
 
 function applyManualOura(){
   const hrv=parseInt(document.getElementById("m-hrv")?.value)||0;

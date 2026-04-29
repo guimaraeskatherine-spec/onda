@@ -885,7 +885,7 @@ async function getItemImage(query){
 function buildShop(data,elId,prefix){
   const saved=loadState(prefix);
   const el=document.getElementById(elId);
-  el.className="shop-grid";
+  el.style.cssText="display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px 4px;";
   el.innerHTML=data.map((item,i)=>{
     const bought=saved[i]||false;
     const imgSrc=`https://source.unsplash.com/200x200/?${encodeURIComponent(item.q+' product')}`;
@@ -1071,10 +1071,10 @@ function init(){
   const now=new Date();
   document.getElementById("home-date").textContent=now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
   document.getElementById("sym-date").textContent="Week 5+2 · "+now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
-  document.getElementById("oura-date").textContent=now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+  const odEl=document.getElementById("oura-date");if(odEl)odEl.textContent=now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
   try{
     const nk=localStorage.getItem("bloom_notion_key");if(nk)document.getElementById("notion-key").value=nk;
-    const ok=localStorage.getItem("bloom_oura_token");if(ok)document.getElementById("oura-token").value=ok;
+    try{const ok=localStorage.getItem("bloom_oura_token");const otEl=document.getElementById("oura-token");if(ok&&otEl)otEl.value=ok;}catch(e){}
   }catch(e){}
   const autoTod=getAutoTod();tod=autoTod;
   document.querySelectorAll("#tod-group .pill-btn").forEach(b=>{if(b.textContent===autoTod)b.classList.add("p-active");});

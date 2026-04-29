@@ -1,0 +1,1169 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+<meta name="apple-mobile-web-app-capable" content="yes">
+<meta name="apple-mobile-web-app-status-bar-style" content="default">
+<meta name="apple-mobile-web-app-title" content="Onda">
+<meta name="theme-color" content="#fdf6f0">
+<title>Onda — My Pregnancy App</title>
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,500;1,400&family=Jost:wght@300;400;500&display=swap" rel="stylesheet">
+<style>
+:root{
+  --blush:#e8a0b0;--blush-light:#fdf0f3;--blush-mid:#f5cdd6;--blush-dark:#b5566a;
+  --cream:#fdf6f0;--cream-mid:#f5ede4;--warm:#c8956a;--warm-light:#fdf0e6;
+  --sage:#8aab96;--sage-light:#eef5f1;--mauve:#9b7fa6;--mauve-light:#f5f0f8;
+  --rose:#d4637a;--oura:#6c63a6;--oura-light:#f0eef9;
+  --text:#2c2016;--text-mid:#6b5a50;--text-muted:#a89990;
+  --border:rgba(200,149,106,0.15);--border-strong:rgba(200,149,106,0.3);
+  --white:#fff;--radius:20px;--radius-sm:12px;--nav-h:68px;
+}
+*{box-sizing:border-box;margin:0;padding:0;-webkit-tap-highlight-color:transparent;}
+html,body{height:100%;overflow:hidden;}
+body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);display:flex;flex-direction:column;max-width:430px;margin:0 auto;}
+
+/* SCREENS */
+.screen{display:none;flex:1;overflow-y:auto;overflow-x:hidden;padding-bottom:calc(var(--nav-h)+16px);}
+.screen.active{display:block;}
+
+/* HEADER */
+.page-header{padding:52px 20px 14px;background:var(--white);border-bottom:1px solid var(--border);position:sticky;top:0;z-index:10;}
+.page-header h1{font-family:'Playfair Display',serif;font-size:24px;font-weight:400;color:var(--text);}
+.page-header h1 em{color:var(--blush-dark);font-style:italic;}
+.page-header p{font-size:12px;color:var(--text-muted);margin-top:3px;}
+
+/* NAV */
+.nav{position:fixed;bottom:0;left:50%;transform:translateX(-50%);width:100%;max-width:430px;height:var(--nav-h);background:var(--white);border-top:1px solid var(--border);display:flex;align-items:flex-start;padding-top:8px;z-index:20;}
+.nav-btn{flex:1;display:flex;flex-direction:column;align-items:center;gap:2px;background:none;border:none;cursor:pointer;padding:2px 0;font-family:'Jost',sans-serif;}
+.nav-icon{width:28px;height:28px;border-radius:8px;display:flex;align-items:center;justify-content:center;font-size:15px;transition:background 0.15s;}
+.nav-btn.active .nav-icon{background:var(--blush-light);}
+.nav-label{font-size:9px;color:var(--text-muted);letter-spacing:0.04em;text-transform:uppercase;}
+.nav-btn.active .nav-label{color:var(--blush-dark);font-weight:500;}
+
+/* SHARED */
+.card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius);margin:10px 16px 0;padding:16px;}
+.slabel{font-size:10px;font-weight:500;letter-spacing:0.1em;text-transform:uppercase;color:var(--text-muted);padding:14px 20px 6px;}
+.add-btn{padding:10px 18px;background:var(--blush);color:var(--white);border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'Jost',sans-serif;}
+.line-input{width:100%;padding:10px 14px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-size:13px;font-family:'Jost',sans-serif;background:var(--white);color:var(--text);outline:none;}
+.line-input:focus{border-color:var(--blush);}
+.big-input{width:100%;padding:12px 14px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-size:13px;font-family:'Jost',sans-serif;background:var(--white);color:var(--text);outline:none;resize:vertical;min-height:80px;}
+.big-input:focus{border-color:var(--blush);}
+.del-btn{background:none;border:none;color:var(--text-muted);font-size:16px;cursor:pointer;padding:0 4px;line-height:1;flex-shrink:0;}
+
+/* TOAST */
+.toast{position:fixed;bottom:calc(var(--nav-h)+12px);left:50%;transform:translateX(-50%) translateY(6px);background:var(--text);color:var(--white);font-size:12px;font-weight:500;padding:8px 18px;border-radius:999px;opacity:0;transition:opacity 0.2s,transform 0.2s;pointer-events:none;white-space:nowrap;z-index:50;}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0);}
+
+/* PILL BUTTONS */
+.pill-btn{padding:7px 14px;border-radius:999px;border:1px solid var(--border-strong);background:var(--white);font-size:12px;color:var(--text-muted);cursor:pointer;font-family:'Jost',sans-serif;transition:all 0.15s;}
+.pill-btn.p-active{background:var(--blush);color:var(--white);border-color:var(--blush);}
+.pill-btn.p-mild{background:var(--sage-light);color:var(--sage);border-color:var(--sage);}
+.pill-btn.p-moderate{background:var(--warm-light);color:var(--warm);border-color:var(--warm);}
+.pill-btn.p-strong{background:#fef0f2;color:var(--rose);border-color:var(--blush-mid);}
+
+/* ======= HOME ======= */
+.home-hero{margin:14px 16px 0;border-radius:var(--radius);background:var(--blush-light);border:1px solid var(--blush-mid);padding:20px;}
+.home-hero-title{font-family:'Playfair Display',serif;font-size:22px;color:var(--blush-dark);line-height:1.2;}
+.home-hero-title em{font-style:italic;}
+.stats-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin:10px 16px 0;}
+.stat-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;}
+.stat-val{font-family:'Playfair Display',serif;font-size:26px;color:var(--blush-dark);line-height:1;}
+.stat-lbl{font-size:11px;color:var(--text-muted);margin-top:4px;}
+.prog-bar-outer{height:6px;background:var(--blush-mid);border-radius:999px;overflow:hidden;margin-top:8px;}
+.prog-bar-inner{height:100%;background:var(--blush);border-radius:999px;}
+.quick-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 16px;}
+.qa-btn{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px 12px;cursor:pointer;text-align:left;font-family:'Jost',sans-serif;transition:background 0.1s;}
+.qa-btn:active{background:var(--cream);}
+.qa-icon{font-size:18px;margin-bottom:6px;display:block;}
+.qa-label{font-size:12px;font-weight:500;color:var(--text);}
+.qa-sub{font-size:10px;color:var(--text-muted);margin-top:2px;}
+
+/* ======= OURA ======= */
+.oura-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 16px;}
+.oura-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;}
+.oura-val{font-family:'Playfair Display',serif;font-size:26px;color:var(--oura);line-height:1;}
+.oura-lbl{font-size:10px;color:var(--text-muted);margin-top:4px;letter-spacing:0.04em;text-transform:uppercase;}
+.oura-sub{font-size:11px;color:var(--text-mid);margin-top:3px;}
+.oura-bar-wrap{height:5px;background:var(--oura-light);border-radius:999px;overflow:hidden;margin-top:8px;}
+.oura-bar{height:100%;border-radius:999px;background:var(--oura);}
+.oura-trend{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;color:var(--text-muted);}
+.trend-up{color:var(--sage);}
+.trend-down{color:var(--rose);}
+.oura-setup{background:var(--oura-light);border:1px solid rgba(108,99,166,0.2);border-radius:var(--radius-sm);padding:14px;margin:0 16px;}
+.oura-hint{font-size:12px;color:var(--text-mid);line-height:1.6;}
+.oura-hint a{color:var(--oura);text-decoration:none;}
+.oura-hint strong{color:var(--text);}
+.settings-input{width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-size:12px;font-family:'Jost',sans-serif;background:var(--white);color:var(--text);outline:none;margin-top:8px;}
+.settings-input:focus{border-color:var(--oura);}
+.oura-fetch-btn{width:100%;margin-top:8px;padding:10px;background:var(--oura);color:var(--white);border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'Jost',sans-serif;}
+.oura-note{font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;}
+
+/* ======= SYMPTOMS ======= */
+.sym-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;}
+.sym-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.1s;min-height:68px;display:flex;flex-direction:column;gap:4px;}
+.sym-card:active{transform:scale(0.96);}
+.sym-card.tapped{animation:tap-flash 0.35s ease;}
+@keyframes tap-flash{0%{background:var(--blush-light);border-color:var(--blush);}100%{background:var(--white);border-color:var(--border);}}
+.sym-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0;}
+.sym-top{display:flex;align-items:center;gap:6px;}
+.sym-name{font-size:12px;font-weight:500;color:var(--text);line-height:1.3;}
+.sym-cat{font-size:10px;color:var(--text-muted);}
+.sym-tally{position:absolute;top:8px;right:8px;font-size:11px;font-weight:500;color:var(--blush);opacity:0;transition:opacity 0.2s;}
+.sym-tally.show{opacity:1;}
+.log-list{padding:0 16px;}
+.log-item{display:flex;align-items:center;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);animation:fadein 0.2s ease;}
+@keyframes fadein{from{opacity:0;transform:translateY(-4px);}to{opacity:1;transform:translateY(0);}}
+.log-item:last-child{border-bottom:none;}
+.log-name{flex:1;font-size:13px;font-weight:500;color:var(--text);}
+.log-meta{font-size:11px;color:var(--text-muted);}
+.sev-pill{font-size:10px;font-weight:500;padding:2px 8px;border-radius:999px;}
+.sp-mild{background:var(--sage-light);color:var(--sage);}
+.sp-moderate{background:var(--warm-light);color:var(--warm);}
+.sp-strong{background:#fef0f2;color:var(--rose);}
+.notion-bar{margin:8px 16px 0;padding:10px 14px;border-radius:var(--radius-sm);font-size:12px;display:none;align-items:center;gap:8px;}
+.nb-ok{background:var(--sage-light);color:var(--sage);display:flex;}
+.nb-err{background:#fef0f2;color:var(--rose);display:flex;}
+.nb-load{background:var(--cream-mid);color:var(--text-muted);display:flex;}
+.chart-wrap{padding:0 16px;}
+.chart-row{display:flex;align-items:center;gap:8px;margin-bottom:8px;}
+.chart-name{font-size:11px;color:var(--text);width:108px;flex-shrink:0;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.chart-track{flex:1;height:7px;background:var(--cream-mid);border-radius:999px;overflow:hidden;}
+.chart-fill{height:100%;border-radius:999px;transition:width 0.5s ease;}
+.chart-n{font-size:11px;color:var(--text-muted);width:14px;text-align:right;flex-shrink:0;}
+.undo-row{display:flex;justify-content:flex-end;padding:4px 16px 0;}
+.undo-btn{font-size:12px;color:var(--blush-dark);background:none;border:none;cursor:pointer;font-family:'Jost',sans-serif;padding:4px 0;}
+
+/* ======= SHOPPING ======= */
+.shop-item{border-bottom:1px solid var(--border);padding:12px 0;}
+.shop-item:last-child{border-bottom:none;}
+.shop-top{display:flex;align-items:flex-start;gap:10px;}
+.shop-top input[type=checkbox]{margin-top:3px;flex-shrink:0;accent-color:var(--blush);width:15px;height:15px;cursor:pointer;}
+.shop-label{font-size:13px;color:var(--text);font-weight:500;flex:1;}
+.shop-label.done{text-decoration:line-through;color:var(--text-muted);}
+.shop-when{font-size:10px;color:var(--text-muted);margin-top:2px;}
+.shop-links{margin-top:8px;padding-left:25px;display:flex;flex-wrap:wrap;gap:6px;}
+.shop-link-pill{display:flex;align-items:center;gap:5px;background:var(--cream-mid);border:1px solid var(--border-strong);border-radius:999px;padding:4px 10px;font-size:11px;color:var(--text-mid);text-decoration:none;max-width:180px;overflow:hidden;}
+.shop-link-pill span{overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+.shop-link-del{background:none;border:none;cursor:pointer;color:var(--text-muted);font-size:13px;line-height:1;flex-shrink:0;padding:0;}
+.add-link-row{margin-top:6px;padding-left:25px;display:flex;gap:6px;}
+.add-link-inp{flex:1;padding:6px 10px;border:1px solid var(--border-strong);border-radius:999px;font-size:11px;font-family:'Jost',sans-serif;background:var(--white);color:var(--text);outline:none;}
+.add-link-inp:focus{border-color:var(--blush);}
+.add-link-btn{padding:6px 12px;background:var(--blush-light);color:var(--blush-dark);border:1px solid var(--blush-mid);border-radius:999px;font-size:11px;font-weight:500;cursor:pointer;font-family:'Jost',sans-serif;white-space:nowrap;}
+.shop-search-row{margin-top:6px;padding-left:25px;display:flex;gap:6px;}
+.search-btn{padding:5px 10px;border-radius:999px;font-size:11px;font-weight:500;cursor:pointer;font-family:'Jost',sans-serif;border:1px solid var(--border-strong);background:var(--white);color:var(--text-mid);text-decoration:none;display:inline-block;}
+.ltk-btn{background:var(--blush-light);color:var(--blush-dark);border-color:var(--blush-mid);}
+
+/* ======= TODOS ======= */
+.todo-item{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.todo-item:last-child{border-bottom:none;}
+.todo-item input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--blush);width:15px;height:15px;cursor:pointer;}
+.todo-text{font-size:13px;color:var(--text);}
+.todo-text.done{text-decoration:line-through;color:var(--text-muted);}
+.todo-when{font-size:10px;color:var(--warm);margin-top:2px;font-weight:500;}
+.trimester-divider{margin:14px 16px 0;padding:10px 14px;background:var(--cream-mid);border-radius:var(--radius-sm);font-size:11px;font-weight:500;color:var(--text-mid);letter-spacing:0.06em;text-transform:uppercase;}
+
+/* ======= PARTNER ======= */
+.partner-item{display:flex;align-items:flex-start;gap:12px;padding:11px 0;border-bottom:1px solid var(--border);}
+.partner-item:last-child{border-bottom:none;}
+.partner-item input[type=checkbox]{margin-top:2px;flex-shrink:0;accent-color:var(--mauve);width:15px;height:15px;cursor:pointer;}
+.partner-text{font-size:13px;color:var(--text);}
+.partner-text.done{text-decoration:line-through;color:var(--text-muted);}
+.partner-when{font-size:10px;color:var(--mauve);margin-top:2px;font-weight:500;}
+
+/* ======= DOCTOR / NOTES ======= */
+.doc-q{display:flex;align-items:flex-start;gap:10px;padding:10px 0;border-bottom:1px solid var(--border);}
+.doc-q:last-child{border-bottom:none;}
+.doc-q-text{flex:1;font-size:13px;color:var(--text);line-height:1.4;}
+.appt-card{background:var(--cream-mid);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;}
+.appt-date{font-size:11px;color:var(--warm);font-weight:500;}
+.appt-text{font-size:13px;color:var(--text);margin-top:4px;line-height:1.5;}
+.worry-card{background:var(--mauve-light);border:1px solid rgba(155,127,166,0.2);border-radius:var(--radius-sm);padding:12px 14px;margin-bottom:8px;display:flex;gap:10px;}
+.worry-text{flex:1;font-size:13px;color:var(--text);line-height:1.4;}
+.worry-date{font-size:10px;color:var(--text-muted);margin-top:3px;}
+.reassure-item{padding:10px 0;border-bottom:1px solid var(--border);}
+.reassure-item:last-child{border-bottom:none;}
+.reassure-q{font-size:13px;font-weight:500;color:var(--text);}
+.reassure-a{font-size:12px;color:var(--text-muted);line-height:1.5;margin-top:3px;}
+.alert-section{margin:10px 16px 0;border-radius:var(--radius);overflow:hidden;border:1px solid var(--border);}
+.alert-header{padding:12px 16px;font-size:12px;font-weight:500;}
+.ah-g{background:var(--sage-light);color:var(--sage);}
+.ah-a{background:var(--warm-light);color:var(--warm);}
+.ah-r{background:#fef0f2;color:var(--rose);}
+.alert-item{display:flex;gap:10px;padding:10px 16px;border-top:1px solid var(--border);background:var(--white);}
+.ad-g{width:8px;height:8px;border-radius:50%;background:var(--sage);flex-shrink:0;margin-top:3px;}
+.ad-a{width:8px;height:8px;border-radius:50%;background:var(--warm);flex-shrink:0;margin-top:3px;}
+.ad-r{width:8px;height:8px;border-radius:50%;background:var(--rose);flex-shrink:0;margin-top:3px;}
+.alert-text{font-size:13px;font-weight:500;color:var(--text);}
+.alert-desc{font-size:11px;color:var(--text-muted);margin-top:2px;line-height:1.5;}
+
+/* WEEKS */
+.week-card{margin:10px 16px 0;background:var(--white);border:1px solid var(--border);border-radius:var(--radius);padding:16px;display:flex;gap:14px;align-items:flex-start;}
+.week-card.current{border-color:var(--blush-mid);background:var(--blush-light);}
+.wk-circle{width:40px;height:40px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-family:'Playfair Display',serif;font-size:15px;background:var(--cream-mid);color:var(--text-mid);}
+.week-card.current .wk-circle{background:var(--blush);color:var(--white);}
+.wk-title{font-size:13px;font-weight:500;color:var(--text);}
+.wk-size{font-size:11px;color:var(--warm);margin-top:2px;font-style:italic;}
+.wk-desc{font-size:12px;color:var(--text-muted);margin-top:4px;line-height:1.5;}
+.you-here{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:999px;background:var(--blush);color:var(--white);margin-left:6px;vertical-align:middle;}
+
+/* ======= SHOPPING VISUAL GRID ======= */
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;}
+.shop-visual-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;overflow:hidden;transition:transform 0.1s;position:relative;}
+.shop-visual-card:active{transform:scale(0.97);}
+.shop-visual-card.bought{opacity:0.5;}
+.shop-img-wrap{width:100%;height:110px;background:var(--cream-mid);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.shop-img-wrap img{width:100%;height:110px;object-fit:contain;padding:10px;}
+.shop-card-name{font-size:12px;font-weight:500;color:var(--text);padding:8px 10px 10px;line-height:1.3;}
+.shop-bought-badge{position:absolute;top:6px;right:6px;background:var(--sage);color:white;font-size:9px;font-weight:500;padding:2px 6px;border-radius:999px;}
+.detail-link-pill{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
+.detail-link-pill:last-child{border-bottom:none;}
+.detail-link-pill a{flex:1;font-size:13px;color:var(--blush-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
+</style>
+</head>
+<body>
+
+<!-- HOME -->
+<div class="screen active" id="screen-home">
+  <div class="page-header"><h1>onda</h1><p id="home-date"></p></div>
+  <div style="padding-bottom:8px;">
+    <div class="home-hero">
+      <div class="home-hero-title">Week <em>5+2</em></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:4px;">Due 27 Dec 2026 · London · 244 days to go</div>
+    </div>
+    <div class="stats-row">
+      <div class="stat-card"><div class="stat-val">5+2</div><div class="stat-lbl">Weeks along</div></div>
+      <div class="stat-card"><div class="stat-val">244</div><div class="stat-lbl">Days to go</div></div>
+    </div>
+    <div class="card" style="margin-top:10px;">
+      <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:6px;">
+        <span style="font-size:12px;color:var(--text-mid);">Week 5 of 40</span>
+        <span style="font-size:12px;color:var(--blush-dark);font-weight:500;">13%</span>
+      </div>
+      <div class="prog-bar-outer"><div class="prog-bar-inner" style="width:13%"></div></div>
+      <div style="font-size:12px;color:var(--text-muted);margin-top:10px;line-height:1.6;">Your baby is the size of a <strong style="color:var(--warm);">sesame seed</strong> — about 2mm. The heart is beginning to form and will start beating around week 6. The neural tube — brain and spinal cord — is developing rapidly.</div>
+    </div>
+    <div id="oura-home-row"></div>
+    <div class="slabel">Quick actions</div>
+    <div class="quick-grid">
+      <button class="qa-btn" onclick="goTo('symptoms')"><span class="qa-icon">🌿</span><div class="qa-label">Log symptom</div><div class="qa-sub">One tap · Notion sync</div></button>
+      <button class="qa-btn" onclick="goTo('oura')"><span class="qa-icon">🍎</span><div class="qa-label">Health today</div><div class="qa-sub">HRV · sleep · steps</div></button>
+      <button class="qa-btn" onclick="goTo('shopping')"><span class="qa-icon">🛒</span><div class="qa-label">Shopping</div><div class="qa-sub">Links · wishlist</div></button>
+      <button class="qa-btn" onclick="goTo('doctor')"><span class="qa-icon">💬</span><div class="qa-label">Notes</div><div class="qa-sub">Doctor · worries</div></button>
+    </div>
+    <div class="card" style="background:var(--warm-light);border-color:rgba(200,149,106,0.25);margin-top:10px;">
+      <div style="font-size:12px;font-weight:500;color:var(--warm);margin-bottom:4px;">London tip</div>
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.6;">Self-refer to a midwife online — no GP needed in most London boroughs. If worried before 16 weeks, your local Early Pregnancy Unit (EPU) often accepts self-referrals too.</div>
+    </div>
+  </div>
+</div>
+
+<!-- SYMPTOMS -->
+<div class="screen" id="screen-symptoms">
+  <div class="page-header"><h1>symptom <em>log</em></h1><p id="sym-date"></p></div>
+  <div style="padding-bottom:8px;">
+    <div class="slabel">Time of day</div>
+    <div style="display:flex;gap:6px;padding:0 16px;flex-wrap:wrap;" id="tod-group">
+      <button class="pill-btn" onclick="setTod('Morning',this)">Morning</button>
+      <button class="pill-btn" onclick="setTod('Afternoon',this)">Afternoon</button>
+      <button class="pill-btn" onclick="setTod('Evening',this)">Evening</button>
+      <button class="pill-btn" onclick="setTod('Night',this)">Night</button>
+    </div>
+    <div class="slabel" style="padding-top:10px;">Severity</div>
+    <div style="display:flex;gap:6px;padding:0 16px;">
+      <button class="pill-btn" id="sev-mild" onclick="setSev('Mild')">Mild</button>
+      <button class="pill-btn" id="sev-moderate" onclick="setSev('Moderate')">Moderate</button>
+      <button class="pill-btn" id="sev-strong" onclick="setSev('Strong')">Strong</button>
+    </div>
+    <div class="slabel" style="padding-top:12px;">Tap to log</div>
+    <div class="sym-grid" id="sym-grid"></div>
+    <div style="display:flex;gap:8px;padding:8px 16px 0;">
+      <input class="line-input" id="custom-inp" placeholder="Other symptom..." style="flex:1;">
+      <button class="add-btn" onclick="logCustom()" style="padding:10px 14px;">Log</button>
+    </div>
+    <div id="notion-bar" class="notion-bar"></div>
+    <div class="undo-row"><button class="undo-btn" onclick="undoLast()">Undo last log ↩</button></div>
+    <div class="slabel" style="padding-top:10px;">Today's log</div>
+    <div class="log-list" id="log-list"><div style="font-size:13px;color:var(--text-muted);padding:12px 0;font-style:italic;">Nothing logged yet.</div></div>
+    <div class="slabel" style="padding-top:12px;">Most frequent this session</div>
+    <div class="chart-wrap" id="chart-wrap"><div style="font-size:13px;color:var(--text-muted);font-style:italic;padding-bottom:8px;">Log symptoms to see the chart.</div></div>
+  </div>
+</div>
+
+<!-- APPLE HEALTH -->
+<div class="screen" id="screen-oura">
+  <div class="page-header"><h1>health <em>today</em></h1><p id="oura-date"></p></div>
+  <div style="padding-bottom:8px;">
+    <div class="slabel">Your data today</div>
+    <div class="oura-grid" id="oura-grid">
+      <div class="oura-card"><div class="oura-val" id="o-hrv">--</div><div class="oura-lbl">HRV (ms)</div><div class="oura-sub" id="o-hrv-sub"></div></div>
+      <div class="oura-card"><div class="oura-val" id="o-rhr">--</div><div class="oura-lbl">Resting HR</div><div class="oura-sub" id="o-rhr-sub"></div></div>
+      <div class="oura-card"><div class="oura-val" id="o-sleep">--</div><div class="oura-lbl">Sleep (hrs)</div><div class="oura-sub" id="o-sleep-sub"></div></div>
+      <div class="oura-card"><div class="oura-val" id="o-steps">--</div><div class="oura-lbl">Steps</div><div class="oura-sub" id="o-steps-sub"></div></div>
+      <div class="oura-card"><div class="oura-val" id="o-temp">--</div><div class="oura-lbl">Temp (°C)</div><div class="oura-sub" id="o-temp-sub"></div></div>
+      <div class="oura-card"><div class="oura-val" id="o-ready">--</div><div class="oura-lbl">Resp. rate</div><div class="oura-sub" id="o-ready-sub"></div></div>
+    </div>
+    <div class="slabel" style="padding-top:12px;">Pregnancy context</div>
+    <div class="card" style="margin-top:0;">
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.7;" id="oura-insight">Tap "Load from Health" to see your Apple Health data with pregnancy insights.</div>
+    </div>
+    <div class="slabel" style="padding-top:12px;">Connect Apple Health</div>
+    <div class="oura-setup">
+      <div class="oura-hint">
+        <strong>Apple Health syncs automatically</strong> when you open Onda from your home screen on iPhone.<br><br>
+        Tap the button below — your browser will ask permission to read Health data. Once approved, your stats load instantly every time. No token or login needed. 🍎
+      </div>
+      <button class="oura-fetch-btn" onclick="fetchAppleHealth()" style="margin-top:12px;">Load from Apple Health</button>
+      <div class="oura-note" id="oura-status" style="margin-top:8px;"></div>
+      <div style="margin-top:14px;border-top:1px solid var(--border);padding-top:14px;">
+        <div style="font-size:11px;font-weight:500;color:var(--text-mid);margin-bottom:8px;">Or enter manually from your Health app</div>
+        <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;">
+          <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">HRV (ms)</div><input id="m-hrv" class="line-input" style="font-size:14px;padding:9px 10px;" placeholder="--" type="number"></div>
+          <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Resting HR</div><input id="m-rhr" class="line-input" style="font-size:14px;padding:9px 10px;" placeholder="--" type="number"></div>
+          <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Sleep (hrs)</div><input id="m-sleep" class="line-input" style="font-size:14px;padding:9px 10px;" placeholder="--" type="number" step="0.1"></div>
+          <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Steps</div><input id="m-steps" class="line-input" style="font-size:14px;padding:9px 10px;" placeholder="--" type="number"></div>
+          <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Temp (°C)</div><input id="m-temp" class="line-input" style="font-size:14px;padding:9px 10px;" placeholder="--" type="number" step="0.1"></div>
+          <div><div style="font-size:10px;color:var(--text-muted);text-transform:uppercase;letter-spacing:0.06em;margin-bottom:4px;">Resp. rate</div><input id="m-resp" class="line-input" style="font-size:14px;padding:9px 10px;" placeholder="--" type="number" step="0.1"></div>
+        </div>
+        <button class="add-btn" style="width:100%;margin-top:10px;" onclick="applyManualHealth()">Apply my data</button>
+      </div>
+    </div>
+    <div class="slabel" style="padding-top:12px;">Why this matters in pregnancy</div>
+    <div class="card" style="margin-top:0;">
+      <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
+        <strong style="color:var(--text);">HRV</strong> — often drops in first trimester as blood volume increases. Don't panic if lower than usual — it's your body adapting.<br><br>
+        <strong style="color:var(--text);">Resting heart rate</strong> — typically rises 10–20 bpm during pregnancy as your heart pumps more blood. Very normal.<br><br>
+        <strong style="color:var(--text);">Sleep</strong> — disrupted sleep is very normal weeks 6–10. Fatigue is your body's way of saying it's working hard.<br><br>
+        <strong style="color:var(--text);">Steps</strong> — gentle movement is encouraged. Aim for 5,000–8,000 steps in first trimester, listen to your body.<br><br>
+        <strong style="color:var(--text);">Temperature</strong> — a slightly elevated basal temp in early pregnancy is a positive sign. Stay cool and hydrated.
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- WEEKS -->
+<div class="screen" id="screen-weeks">
+  <div class="page-header"><h1>week by <em>week</em></h1><p>Baby development · due 27 Dec 2026</p></div>
+  <div id="weeks-list" style="padding-bottom:8px;"></div>
+</div>
+
+<!-- SHOPPING -->
+<div class="screen" id="screen-shopping">
+  <div class="page-header"><h1>shopping <em>list</em></h1><p>Tap an item to see details and add links</p></div>
+  <div style="padding-bottom:8px;">
+    <div class="slabel">Buy now — first trimester</div>
+    <div id="shop-q1"></div>
+    <div class="slabel">Second trimester (weeks 13–27)</div>
+    <div id="shop-q2"></div>
+    <div class="slabel">Third trimester (weeks 28–40)</div>
+    <div id="shop-q3"></div>
+  </div>
+</div>
+
+<!-- SHOPPING DETAIL VIEW -->
+<div class="screen" id="screen-shop-detail">
+  <div class="page-header" style="padding-top:44px;">
+    <button onclick="goTo('shopping')" style="background:none;border:none;font-size:13px;color:var(--blush-dark);cursor:pointer;padding:0;font-family:'Jost',sans-serif;margin-bottom:8px;">← Back to list</button>
+    <h1 id="detail-title" style="font-size:20px;"></h1>
+    <p id="detail-when"></p>
+  </div>
+  <div style="padding-bottom:8px;">
+    <div style="margin:12px 16px 0;border-radius:var(--radius);overflow:hidden;background:var(--cream-mid);height:200px;display:flex;align-items:center;justify-content:center;" id="detail-img-wrap">
+      <img id="detail-img" style="width:100%;height:200px;object-fit:contain;padding:16px;" src="" alt="">
+    </div>
+    <div class="card" style="margin-top:10px;" id="detail-desc-card">
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;" id="detail-desc"></div>
+    </div>
+    <div class="slabel" style="padding-top:12px;">Search for this item</div>
+    <div style="display:flex;gap:8px;padding:0 16px;">
+      <a id="detail-amazon" class="search-btn" href="#" target="_blank" style="flex:1;text-align:center;padding:10px;">🛒 Amazon UK</a>
+      <a class="search-btn ltk-btn" href="https://www.shopltk.com/explore/molliecampsie/productsets/11f1205d55966cce91110242ac110024" target="_blank" style="flex:1;text-align:center;padding:10px;">🩷 LTK picks</a>
+    </div>
+    <div class="slabel" style="padding-top:12px;">My saved links</div>
+    <div class="card" style="margin-top:0;">
+      <div id="detail-links"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <input class="line-input" id="detail-link-inp" placeholder="Paste a link to save..." style="flex:1;">
+        <button class="add-btn" onclick="addDetailLink()" style="padding:10px 14px;">Save</button>
+      </div>
+    </div>
+    <div class="slabel" style="padding-top:12px;">Mark as</div>
+    <div style="display:flex;gap:8px;padding:0 16px;">
+      <button class="add-btn" onclick="toggleDetailCheck()" id="detail-check-btn" style="flex:1;background:var(--sage);border:none;">Mark as bought</button>
+    </div>
+  </div>
+</div>
+
+<!-- TODOS -->
+<div class="screen" id="screen-todos">
+  <div class="page-header"><h1>to-dos & <em>appointments</em></h1><p>Everything you need to action</p></div>
+  <div style="padding-bottom:8px;">
+    <div class="trimester-divider">Do now — weeks 4–12</div>
+    <div class="card" style="margin-top:8px;padding:12px 16px;"><div id="todo-q1"></div></div>
+    <div class="trimester-divider">Second trimester (weeks 13–27)</div>
+    <div class="card" style="margin-top:8px;padding:12px 16px;"><div id="todo-q2"></div></div>
+    <div class="trimester-divider">Third trimester (weeks 28–40)</div>
+    <div class="card" style="margin-top:8px;padding:12px 16px;"><div id="todo-q3"></div></div>
+  </div>
+</div>
+
+<!-- PARTNER -->
+<div class="screen" id="screen-partner">
+  <div class="page-header"><h1>partner <em>homework</em></h1><p>Share this tab with your partner 💛</p></div>
+  <div style="padding-bottom:8px;">
+    <div class="card" style="background:var(--mauve-light);border-color:rgba(155,127,166,0.25);margin-top:10px;">
+      <div style="font-size:13px;color:var(--mauve);line-height:1.6;">These are the things that matter most right now. Tick them off together.</div>
+    </div>
+    <div class="trimester-divider">Right now — weeks 4–12</div>
+    <div class="card" style="margin-top:8px;padding:12px 16px;"><div id="partner-q1"></div></div>
+    <div class="trimester-divider">Second trimester (weeks 13–27)</div>
+    <div class="card" style="margin-top:8px;padding:12px 16px;"><div id="partner-q2"></div></div>
+    <div class="trimester-divider">Third trimester (weeks 28–40)</div>
+    <div class="card" style="margin-top:8px;padding:12px 16px;"><div id="partner-q3"></div></div>
+    <div class="slabel">Add a task for your partner</div>
+    <div class="card" style="margin-top:0;">
+      <input class="line-input" id="partner-custom-inp" placeholder="e.g. Book the hospital tour...">
+      <button class="add-btn" onclick="addPartnerTask()" style="margin-top:8px;width:100%;">Add task</button>
+    </div>
+    <div id="partner-custom-list" style="padding:0 16px;"></div>
+  </div>
+</div>
+
+<!-- DOCTOR/NOTES -->
+<div class="screen" id="screen-doctor">
+  <div class="page-header"><h1>notes & <em>worries</em></h1><p>Doctor questions · appointments · worries · when to call</p></div>
+  <div style="padding-bottom:8px;">
+    <div class="slabel">Questions for midwife / doctor</div>
+    <div class="card" style="margin-top:0;">
+      <div id="doc-questions"></div>
+      <input class="line-input" id="new-question" placeholder="Add a question..." style="margin-top:10px;">
+      <button class="add-btn" onclick="addQuestion()" style="margin-top:8px;width:100%;">Add question</button>
+    </div>
+    <div class="slabel">Appointment notes</div>
+    <div class="card" style="margin-top:0;">
+      <textarea class="big-input" id="appt-note" placeholder="Notes from your last appointment..."></textarea>
+      <button class="add-btn" onclick="saveApptNote()" style="margin-top:8px;">Save note</button>
+    </div>
+    <div id="appt-notes-list" style="padding:0 16px;"></div>
+    <div class="slabel">Worries journal</div>
+    <div class="card" style="margin-top:0;">
+      <textarea class="big-input" id="worry-inp" placeholder="Write it down — worries feel smaller once out of your head..."></textarea>
+      <button class="add-btn" onclick="addWorry()" style="margin-top:8px;">Add worry</button>
+    </div>
+    <div id="worry-list" style="padding:0 16px;"></div>
+    <div class="slabel">Reassurance — common worries</div>
+    <div class="card" style="margin-top:0;">
+      <div class="reassure-item"><div class="reassure-q">Miscarriage anxiety</div><div class="reassure-a">Very common. Risk drops significantly after a heartbeat is seen at week 6–7. After week 12, falls below 1%.</div></div>
+      <div class="reassure-item"><div class="reassure-q">Symptoms coming and going</div><div class="reassure-a">Totally normal. A good day doesn't mean something is wrong — your body is doing enormous work even when you can't feel it.</div></div>
+      <div class="reassure-item"><div class="reassure-q">Light spotting</div><div class="reassure-a">Brown or pink spotting without pain is usually implantation bleeding. Mention to midwife but not an emergency.</div></div>
+      <div class="reassure-item"><div class="reassure-q">No bump yet</div><div class="reassure-a">Completely normal at 5 weeks. Most first-time mums don't show until 14–20 weeks.</div></div>
+    </div>
+    <div class="slabel">When to call the midwife</div>
+    <div class="alert-section">
+      <div class="alert-header ah-g">Usually normal — mention at next appointment</div>
+      <div class="alert-item"><div class="ad-g"></div><div><div class="alert-text">Mild nausea or vomiting</div><div class="alert-desc">Common weeks 6–12. Try small meals, ginger, sea-bands.</div></div></div>
+      <div class="alert-item"><div class="ad-g"></div><div><div class="alert-text">Light pink or brown spotting, no pain</div><div class="alert-desc">Often implantation bleeding — mention to midwife.</div></div></div>
+      <div class="alert-item"><div class="ad-g"></div><div><div class="alert-text">Mild cramping, fatigue, breast tenderness</div><div class="alert-desc">Normal hormonal responses in first trimester.</div></div></div>
+    </div>
+    <div class="alert-section" style="margin-top:8px;">
+      <div class="alert-header ah-a">Call your midwife same day</div>
+      <div class="alert-item"><div class="ad-a"></div><div><div class="alert-text">Heavy or bright red bleeding</div><div class="alert-desc">Especially with clots — get seen today.</div></div></div>
+      <div class="alert-item"><div class="ad-a"></div><div><div class="alert-text">Can't keep fluids down for 24hrs</div><div class="alert-desc">May be hyperemesis gravidarum — needs treatment.</div></div></div>
+      <div class="alert-item"><div class="ad-a"></div><div><div class="alert-text">Burning when weeing / high temperature</div><div class="alert-desc">Likely UTI — common in pregnancy, needs antibiotics quickly.</div></div></div>
+      <div class="alert-item"><div class="ad-a"></div><div><div class="alert-text">Sudden loss of all symptoms</div><div class="alert-desc">Call and ask for a reassurance scan.</div></div></div>
+    </div>
+    <div class="alert-section" style="margin-top:8px;margin-bottom:10px;">
+      <div class="alert-header ah-r">Go to A&amp;E or call 999</div>
+      <div class="alert-item"><div class="ad-r"></div><div><div class="alert-text">Severe one-sided abdominal pain</div><div class="alert-desc">Could indicate ectopic pregnancy — medical emergency.</div></div></div>
+      <div class="alert-item"><div class="ad-r"></div><div><div class="alert-text">Heavy bleeding with severe pain</div><div class="alert-desc">Go to A&amp;E immediately.</div></div></div>
+      <div class="alert-item"><div class="ad-r"></div><div><div class="alert-text">Fainting, chest pain, difficulty breathing</div><div class="alert-desc">Call 999.</div></div></div>
+    </div>
+    <div class="slabel">Notion API key</div>
+    <div style="padding:0 16px 8px;">
+      <input class="line-input" id="notion-key" type="password" placeholder="secret_xxxxxxxxxxxxxxxxxxxx" oninput="saveNotionKey()">
+      <div style="font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;">Get key at <a href="https://www.notion.so/profile/integrations" target="_blank" style="color:var(--blush-dark);">notion.so/profile/integrations</a> → New integration → Internal Integration Secret. Then in Notion open your Symptom Tracker → ••• → Connections → add your integration.</div>
+    </div>
+  </div>
+</div>
+
+<!-- NAV -->
+<nav class="nav">
+  <button class="nav-btn active" id="nav-home" onclick="goTo('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
+  <button class="nav-btn" id="nav-symptoms" onclick="goTo('symptoms')"><div class="nav-icon">🌿</div><div class="nav-label">Symptoms</div></button>
+  <button class="nav-btn" id="nav-oura" onclick="goTo('oura')"><div class="nav-icon">🍎</div><div class="nav-label">Health</div></button>
+  <button class="nav-btn" id="nav-weeks" onclick="goTo('weeks')"><div class="nav-icon">🌱</div><div class="nav-label">Weeks</div></button>
+  <button class="nav-btn" id="nav-shopping" onclick="goTo('shopping')"><div class="nav-icon">🛒</div><div class="nav-label">Shopping</div></button>
+  <button class="nav-btn" id="nav-todos" onclick="goTo('todos')"><div class="nav-icon">✓</div><div class="nav-label">To-dos</div></button>
+  <button class="nav-btn" id="nav-partner" onclick="goTo('partner')"><div class="nav-icon">💛</div><div class="nav-label">Partner</div></button>
+  <button class="nav-btn" id="nav-doctor" onclick="goTo('doctor')"><div class="nav-icon">💬</div><div class="nav-label">Notes</div></button>
+</nav>
+
+<div class="toast" id="toast"></div>
+
+<script>
+const NOTION_DB = "09da01b0a7c4483da7e7ab1215a0660a";
+const catColors = {nausea:"#e8607a",pain:"#c0392b",fatigue:"#8a8a8a",emotional:"#7c5cbf",physical:"#3d9e8c",other:"#d4874a"};
+const symptoms = [
+  {name:"Nausea",cat:"nausea"},{name:"Vomiting",cat:"nausea"},
+  {name:"Breast tenderness",cat:"physical"},{name:"Fatigue",cat:"fatigue"},
+  {name:"Headache",cat:"pain"},{name:"Cramps / pelvic pain",cat:"pain"},
+  {name:"Back pain",cat:"pain"},{name:"Bloating",cat:"physical"},
+  {name:"Constipation",cat:"physical"},{name:"Heartburn",cat:"physical"},
+  {name:"Frequent urination",cat:"physical"},{name:"Dizziness",cat:"physical"},
+  {name:"Spotting / bleeding",cat:"other"},{name:"Mood swings",cat:"emotional"},
+  {name:"Anxiety",cat:"emotional"},{name:"Food aversion",cat:"nausea"},
+  {name:"Cravings",cat:"other"},{name:"Insomnia",cat:"fatigue"},
+  {name:"Swelling",cat:"physical"},{name:"Round ligament pain",cat:"pain"},
+];
+
+const shopData = {
+  q1:[
+    {l:"Folic acid 400mcg supplements",w:"Now",q:"folic acid pregnancy 400mcg"},
+    {l:"Vitamin D 10mcg",w:"Now",q:"vitamin d pregnancy supplement"},
+    {l:"Ginger sweets / sea-bands",w:"Now",q:"sea bands nausea pregnancy"},
+    {l:"Soft bras — no underwire",w:"As needed",q:"soft maternity bra"},
+    {l:"Pregnancy pillow",w:"Weeks 8–12",q:"pregnancy pillow"},
+  ],
+  q2:[
+    {l:"Maternity jeans and trousers",w:"Weeks 14–16",q:"maternity jeans"},
+    {l:"Pregnancy support belt",w:"Weeks 18–20",q:"pregnancy support belt"},
+    {l:"Stretch mark oil or cream",w:"Weeks 14+",q:"stretch mark oil pregnancy"},
+    {l:"Nursing bras",w:"Weeks 24–28",q:"nursing bras"},
+    {l:"Cot or Moses basket",w:"Weeks 18–22",q:"moses basket newborn"},
+    {l:"Pram or travel system",w:"Weeks 18–24",q:"travel system pram"},
+    {l:"Infant car seat",w:"Weeks 20–28",q:"infant car seat"},
+    {l:"Baby monitor",w:"Weeks 24–28",q:"baby monitor"},
+  ],
+  q3:[
+    {l:"Hospital bag",w:"Pack by week 36",q:"hospital bag maternity"},
+    {l:"Newborn nappies and wipes",w:"Weeks 34–36",q:"newborn nappies"},
+    {l:"Sleepsuits x6+ and vests x6+",w:"Weeks 34–36",q:"newborn sleepsuits"},
+    {l:"Breast pump",w:"Weeks 34–36",q:"breast pump electric"},
+    {l:"Nipple cream — Lansinoh",w:"Weeks 34–36",q:"lansinoh nipple cream"},
+    {l:"Muslins x20",w:"Weeks 34–36",q:"muslin cloths baby"},
+    {l:"Baby bath",w:"Weeks 28–34",q:"baby bath tub"},
+    {l:"Changing mat",w:"Weeks 28–34",q:"changing mat baby"},
+    {l:"Bouncy chair",w:"Weeks 34–36",q:"bouncy chair baby"},
+    {l:"Swaddle blankets x3",w:"Weeks 34–36",q:"swaddle blankets baby"},
+  ]
+};
+
+const todoData = {
+  q1:[
+    {l:"Self-refer to midwife online (London)",w:"This week"},
+    {l:"Start folic acid 400mcg daily",w:"Now"},
+    {l:"Check medications are safe with GP",w:"Now"},
+    {l:"Early reassurance scan (optional, private)",w:"Week 7–8"},
+    {l:"Booking appointment with midwife",w:"Week 8–10"},
+    {l:"Blood tests at booking appointment",w:"Week 8–10"},
+    {l:"Dating / nuchal scan (NHS)",w:"Week 11–14"},
+    {l:"Check maternity pay and leave entitlement",w:"Before week 15"},
+  ],
+  q2:[
+    {l:"20-week anatomy scan",w:"Week 18–21"},
+    {l:"Notify employer officially",w:"By week 25"},
+    {l:"Submit MATB1 form to employer",w:"Week 20+"},
+    {l:"Book NCT or NHS antenatal classes",w:"Week 20–24"},
+    {l:"Think about birth preferences",w:"Week 20–28"},
+    {l:"Research London hospitals",w:"Week 16–24"},
+    {l:"Set up nursery",w:"Week 20–28"},
+    {l:"Research childcare — waitlists are long!",w:"Week 16+"},
+  ],
+  q3:[
+    {l:"Pre-register at your London hospital",w:"Week 34–36"},
+    {l:"Write up birth preferences",w:"Week 32–36"},
+    {l:"Pack hospital bag",w:"Week 34–36"},
+    {l:"Install car seat — get it checked",w:"Week 36"},
+    {l:"Register baby with a local GP",w:"Week 36"},
+    {l:"Perineal massage daily",w:"Week 34+"},
+    {l:"Plan route to hospital",w:"Week 36"},
+    {l:"Freeze meals for after birth",w:"Week 34–38"},
+  ]
+};
+
+const partnerData = {
+  q1:[
+    {l:"Come to the booking midwife appointment",w:"Week 8–10"},
+    {l:"Read up on first trimester symptoms",w:"Now"},
+    {l:"Take on more household tasks — fatigue is real",w:"Now"},
+    {l:"Be patient with mood changes",w:"Now"},
+    {l:"Don't announce without her go-ahead",w:"Now"},
+    {l:"Cut back on alcohol around her",w:"Now"},
+  ],
+  q2:[
+    {l:"Come to the 20-week anatomy scan",w:"Week 20"},
+    {l:"Research prams and car seats together",w:"Weeks 18–22"},
+    {l:"Attend NCT or antenatal classes",w:"Weeks 20–28"},
+    {l:"Help set up the nursery",w:"Week 24–28"},
+    {l:"Learn about labour as a birth partner",w:"Week 24–28"},
+    {l:"Notify employer of paternity leave",w:"Week 28+"},
+  ],
+  q3:[
+    {l:"Do a test run to the hospital",w:"Week 36"},
+    {l:"Pack your own hospital bag",w:"Week 34–36"},
+    {l:"Set up car seat — get it checked",w:"Week 36"},
+    {l:"Read about newborn care and feeding support",w:"Week 34+"},
+    {l:"Be the advocate and protector during labour",w:"Week 37+"},
+    {l:"Freeze meals together for the fourth trimester",w:"Week 34–38"},
+  ]
+};
+
+const weeksData = [
+  {w:1,t:"Weeks 1–2",s:null,d:"Conception and implantation. Your body is preparing.",tri:1},
+  {w:3,t:"Week 3",s:"Pinhead",d:"Fertilised egg travels to uterus. Rapid cell division begins.",tri:1},
+  {w:4,t:"Week 4",s:"Poppy seed",d:"Implantation complete. Embryo forms. hCG hormone rising.",tri:1},
+  {w:5,t:"Week 5",s:"Sesame seed (2mm)",d:"Heart begins forming. Neural tube — brain and spinal cord — developing rapidly.",tri:1,cur:true},
+  {w:6,t:"Week 6",s:"Lentil",d:"Heartbeat detectable on scan. Brain, eyes and ears forming.",tri:1},
+  {w:7,t:"Week 7",s:"Blueberry",d:"Face features forming. Arm and leg buds visible.",tri:1},
+  {w:8,t:"Week 8",s:"Raspberry",d:"Fingers starting to form. All major organs developing.",tri:1},
+  {w:9,t:"Week 9",s:"Grape",d:"All essential organs forming. Tail disappears.",tri:1},
+  {w:10,t:"Week 10",s:"Strawberry",d:"Baby officially a fetus. Fingernails forming.",tri:1},
+  {w:11,t:"Week 11",s:"Fig",d:"Genitals forming. Baby can open and close fists.",tri:1},
+  {w:12,t:"Week 12",s:"Lime",d:"End of first trimester! Nuchal scan this week. Risk drops significantly.",tri:1},
+  {w:13,t:"Week 13",s:"Pea pod",d:"Second trimester begins! Fingerprints forming. Energy often returns.",tri:2},
+  {w:14,t:"Week 14",s:"Lemon",d:"Baby can make facial expressions.",tri:2},
+  {w:16,t:"Week 16",s:"Avocado",d:"Baby can hear. You may feel small flutters.",tri:2},
+  {w:20,t:"Week 20",s:"Banana",d:"Halfway! 20-week anatomy scan. Baby very active.",tri:2},
+  {w:24,t:"Week 24",s:"Corn cob",d:"Baby viable outside the womb. Eyes beginning to open.",tri:2},
+  {w:28,t:"Week 28",s:"Aubergine",d:"Third trimester! Baby opens eyes, has sleep/wake cycles.",tri:3},
+  {w:32,t:"Week 32",s:"Butternut squash",d:"Baby practising breathing. Most head-down now.",tri:3},
+  {w:36,t:"Week 36",s:"Honeydew melon",d:"Head may engage in pelvis. Full term in 1 week.",tri:3},
+  {w:37,t:"Week 37",s:"Watermelon",d:"Full term — baby could arrive any time.",tri:3},
+  {w:40,t:"Week 40",s:"Watermelon",d:"Due date: 27 December 2026. Happy birth day! 🌟",tri:3},
+];
+
+let tod="", sev="Mild", todayLog=[], symCounts={};
+let questions=["Is my folic acid dose correct (400mcg)?","Which foods should I avoid?","When will my dating scan be booked?","Can I continue exercising?","Is the NIPT / Harmony test worth doing privately?"];
+let apptNotes=[], worries=[], partnerCustom=[];
+let shopLinks={};
+
+function goTo(s){
+  document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
+  document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));
+  const el=document.getElementById("screen-"+s);
+  if(el){el.classList.add("active");el.scrollTop=0;}
+  const nb=document.getElementById("nav-"+s);
+  if(nb) nb.classList.add("active");
+}
+
+function getAutoTod(){const h=new Date().getHours();if(h>=5&&h<12)return"Morning";if(h>=12&&h<17)return"Afternoon";if(h>=17&&h<21)return"Evening";return"Night";}
+function setTod(t,btn){tod=t;document.querySelectorAll("#tod-group .pill-btn").forEach(b=>b.classList.remove("p-active"));btn.classList.add("p-active");}
+function setSev(s){sev=s;["mild","moderate","strong"].forEach(x=>{const b=document.getElementById("sev-"+x);b.className="pill-btn"+(x===s.toLowerCase()?" p-"+x:"");});}
+
+function buildSymGrid(){
+  document.getElementById("sym-grid").innerHTML=symptoms.map((s,i)=>`
+    <div class="sym-card" id="sc-${i}" onclick="logSym(${i})">
+      <div class="sym-top"><div class="sym-dot" style="background:${catColors[s.cat]}"></div><div class="sym-name">${s.name}</div></div>
+      <div class="sym-cat">${s.cat.charAt(0).toUpperCase()+s.cat.slice(1)}</div>
+      <div class="sym-tally" id="cnt-${i}"></div>
+    </div>`).join("");
+}
+
+function logSym(i){
+  const s=symptoms[i];doLog(s.name,s.cat);
+  const c=document.getElementById("sc-"+i);c.classList.remove("tapped");void c.offsetWidth;c.classList.add("tapped");
+  symCounts[s.name]=(symCounts[s.name]||0)+1;
+  const cnt=document.getElementById("cnt-"+i);cnt.textContent="×"+symCounts[s.name];cnt.classList.add("show");
+}
+
+function logCustom(){const inp=document.getElementById("custom-inp");const v=inp.value.trim();if(!v)return;doLog(v,"other");inp.value="";}
+
+async function doLog(name,cat){
+  const timeOfDay=tod||getAutoTod();
+  const now=new Date();
+  const timeStr=now.toLocaleTimeString("en-GB",{hour:"2-digit",minute:"2-digit"});
+  const dateStr=now.toISOString().split("T")[0];
+  const entry={name,cat,timeOfDay,timeStr,sev,dateStr};
+  todayLog.unshift(entry);
+  renderLogList();renderChart();showToast(name+" logged");
+  await pushToNotion(entry);
+}
+
+function undoLast(){
+  if(!todayLog.length){showToast("Nothing to undo");return;}
+  const removed=todayLog.shift();
+  if(symCounts[removed.name]>0){symCounts[removed.name]--;const idx=symptoms.findIndex(s=>s.name===removed.name);if(idx>=0){const cnt=document.getElementById("cnt-"+idx);if(symCounts[removed.name]===0){cnt.classList.remove("show");}else{cnt.textContent="×"+symCounts[removed.name];}}}
+  renderLogList();renderChart();showToast("Removed: "+removed.name);
+}
+
+function renderLogList(){
+  const el=document.getElementById("log-list");
+  if(!todayLog.length){el.innerHTML='<div style="font-size:13px;color:var(--text-muted);padding:12px 0;font-style:italic;">Nothing logged yet.</div>';return;}
+  el.innerHTML=todayLog.map((e,i)=>`
+    <div class="log-item">
+      <div class="sym-dot" style="background:${catColors[e.cat]||'#888'};width:8px;height:8px;border-radius:50%;flex-shrink:0;"></div>
+      <div class="log-name">${e.name}</div>
+      <div class="log-meta">${e.timeOfDay} · ${e.timeStr}</div>
+      <span class="sev-pill sp-${e.sev.toLowerCase()}">${e.sev}</span>
+      <button class="del-btn" onclick="removeLogItem(${i})" style="font-size:14px;color:var(--text-muted);">×</button>
+    </div>`).join("");
+}
+
+function removeLogItem(i){
+  const removed=todayLog[i];
+  todayLog.splice(i,1);
+  if(symCounts[removed.name]>0){symCounts[removed.name]--;const idx=symptoms.findIndex(s=>s.name===removed.name);if(idx>=0){const cnt=document.getElementById("cnt-"+idx);if(symCounts[removed.name]===0)cnt.classList.remove("show");else cnt.textContent="×"+symCounts[removed.name];}}
+  renderLogList();renderChart();showToast("Entry removed");
+}
+
+function renderChart(){
+  const el=document.getElementById("chart-wrap");
+  const tally={};todayLog.forEach(e=>{tally[e.name]=(tally[e.name]||0)+1;});
+  const sorted=Object.entries(tally).sort((a,b)=>b[1]-a[1]).slice(0,6);
+  if(!sorted.length){el.innerHTML='<div style="font-size:13px;color:var(--text-muted);font-style:italic;padding-bottom:8px;">Log symptoms to see the chart.</div>';return;}
+  const max=sorted[0][1];
+  el.innerHTML=sorted.map(([name,count])=>{
+    const cat=(todayLog.find(e=>e.name===name)||{}).cat||"other";
+    return`<div class="chart-row"><div class="chart-name">${name}</div><div class="chart-track"><div class="chart-fill" style="width:${Math.round((count/max)*100)}%;background:${catColors[cat]}"></div></div><div class="chart-n">${count}</div></div>`;
+  }).join("");
+}
+
+async function pushToNotion(entry){
+  const key=getNotionKey();if(!key)return;
+  const bar=document.getElementById("notion-bar");
+  bar.className="notion-bar nb-load";bar.textContent="Saving to Notion...";
+  const catMap={nausea:"Nausea",pain:"Pain",fatigue:"Fatigue",emotional:"Emotional",physical:"Physical",other:"Other"};
+  try{
+    const res=await fetch("https://api.notion.com/v1/pages",{
+      method:"POST",
+      headers:{"Authorization":"Bearer "+key,"Content-Type":"application/json","Notion-Version":"2022-06-28"},
+      body:JSON.stringify({parent:{database_id:NOTION_DB},properties:{
+        "Symptom":{title:[{text:{content:entry.name}}]},
+        "Date":{date:{start:entry.dateStr}},
+        "Week":{rich_text:[{text:{content:"5+2"}}]},
+        "Severity":{select:{name:entry.sev}},
+        "Category":{select:{name:catMap[entry.cat]||"Other"}},
+        "Notes":{rich_text:[{text:{content:entry.timeOfDay+" · "+entry.timeStr}}]}
+      }})
+    });
+    if(res.ok){bar.className="notion-bar nb-ok";bar.textContent="Saved to Notion ✓";setTimeout(()=>{bar.className="notion-bar";},2500);}
+    else throw new Error();
+  }catch(e){bar.className="notion-bar nb-err";bar.textContent="Check Notion key in Notes tab";setTimeout(()=>{bar.className="notion-bar";},4000);}
+}
+
+// OURA — Claude acts as the fetch proxy to bypass CORS entirely
+async function fetchOura(){
+  const token=document.getElementById("oura-token").value.trim();
+  if(!token){document.getElementById("oura-status").textContent="Please enter your Oura token first.";return;}
+  const statusEl=document.getElementById("oura-status");
+  statusEl.textContent="Connecting to Oura...";
+  try{
+    const res=await fetch("/api/oura?token="+encodeURIComponent(token));
+    if(!res.ok) throw new Error("API error "+res.status);
+    const data=await res.json();
+    if(data.error) throw new Error(data.error);
+    renderOuraData(data.sleep,data.readiness,data.activity,data.daily_sleep);
+    return;
+  }catch(e){
+    statusEl.textContent="Could not connect. Check your token is correct.";
+  }
+}
+async function fetchOura_DISABLED(){
+  const token="disabled";
+  const statusEl=document.getElementById("oura-status");
+  statusEl.textContent="Fetching...";
+  const today=new Date().toISOString().split("T")[0];
+  const yesterday=new Date(Date.now()-86400000).toISOString().split("T")[0];
+
+  try{
+    const claudeRes=await fetch("https://api.anthropic.com/v1/messages",{
+      method:"POST",
+      headers:{"Content-Type":"application/json"},
+      body:JSON.stringify({
+        model:"claude-sonnet-4-20250514",
+        max_tokens:4000,
+        tools:[{"type":"web_search_20250305","name":"web_search"}],
+        system:`You are a data fetching proxy. The user will give you an Oura API bearer token and date range. 
+You must fetch EXACTLY these 4 Oura API V2 URLs using web_search or any available fetch tool, passing the Authorization header.
+Return ONLY a valid JSON object with exactly these 4 keys: sleep, readiness, activity, daily_sleep.
+Each value must be the complete raw API response JSON.
+No markdown. No explanation. No backticks. Pure JSON only.`,
+        messages:[{
+          role:"user",
+          content:`Fetch these Oura API endpoints with Authorization: Bearer ${token}
+
+1. https://api.ouraring.com/v2/usercollection/sleep?start_date=${yesterday}&end_date=${today}
+2. https://api.ouraring.com/v2/usercollection/daily_readiness?start_date=${yesterday}&end_date=${today}  
+3. https://api.ouraring.com/v2/usercollection/daily_activity?start_date=${yesterday}&end_date=${today}
+4. https://api.ouraring.com/v2/usercollection/daily_sleep?start_date=${yesterday}&end_date=${today}
+
+Return only: {"sleep":{...},"readiness":{...},"activity":{...},"daily_sleep":{...}}`
+        }]
+      })
+    });
+
+    const data=await claudeRes.json();
+    // Extract all text content from response
+    const textBlocks=data.content?.filter(c=>c.type==="text")||[];
+    const fullText=textBlocks.map(b=>b.text).join("");
+
+    // Try to parse JSON from response
+    const jsonMatch=fullText.match(/\{[\s\S]*"sleep"[\s\S]*\}/);
+    if(jsonMatch){
+      try{
+        const parsed=JSON.parse(jsonMatch[0]);
+        renderOuraData(parsed.sleep,parsed.readiness,parsed.activity,parsed.daily_sleep);
+        return;
+      }catch(e){}
+    }
+
+    // If Claude couldn't fetch directly (tool limitations), try allorigins proxy
+    await fetchOuraViaAllOrigins(token,yesterday,today);
+
+  }catch(e){
+    await fetchOuraViaAllOrigins(token,yesterday,today);
+  }
+}
+
+async function fetchOuraViaAllOrigins(token,yesterday,today){
+  const statusEl=document.getElementById("oura-status");
+  statusEl.textContent="Trying alternative connection...";
+  // allorigins passes custom headers through unlike corsproxy
+  const base="https://api.allorigins.win/raw?url=";
+  const authParam="&headers="+encodeURIComponent(JSON.stringify({"Authorization":"Bearer "+token}));
+  try{
+    const urls=[
+      `https://api.ouraring.com/v2/usercollection/sleep?start_date=${yesterday}&end_date=${today}`,
+      `https://api.ouraring.com/v2/usercollection/daily_readiness?start_date=${yesterday}&end_date=${today}`,
+      `https://api.ouraring.com/v2/usercollection/daily_activity?start_date=${yesterday}&end_date=${today}`,
+      `https://api.ouraring.com/v2/usercollection/daily_sleep?start_date=${yesterday}&end_date=${today}`,
+    ];
+    // Try fetching each one individually with credentials in URL (Oura supports this for PATs)
+    const results=await Promise.all(urls.map(url=>
+      fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(url)}`)
+        .then(r=>r.json())
+        .then(d=>JSON.parse(d.contents||"{}"))
+        .catch(()=>null)
+    ));
+    // allorigins strips auth headers — use token-in-URL approach as last resort
+    const [sleep,ready,act,daily]=await Promise.all(urls.map(url=>{
+      const authedUrl=url.replace("https://","https://"+token+"@");
+      return fetch(`https://api.allorigins.win/get?url=${encodeURIComponent(authedUrl)}`)
+        .then(r=>r.json()).then(d=>{try{return JSON.parse(d.contents||"{}");}catch(e){return {};}})
+        .catch(()=>({}));
+    }));
+
+    if(sleep?.data||ready?.data||act?.data||daily?.data){
+      renderOuraData(sleep,ready,act,daily);
+    }else{
+      showOuraManualEntry();
+    }
+  }catch(e){
+    showOuraManualEntry();
+  }
+}
+
+
+
+function applyManualOura(){
+  const hrv=parseInt(document.getElementById("m-hrv")?.value)||0;
+  const temp=parseFloat(document.getElementById("m-temp")?.value)||0;
+  const sleep=parseInt(document.getElementById("m-sleep")?.value)||0;
+  const ready=parseInt(document.getElementById("m-ready")?.value)||0;
+  const rhr=parseInt(document.getElementById("m-rhr")?.value)||0;
+  const steps=parseInt(document.getElementById("m-steps")?.value)||0;
+
+  document.getElementById("o-hrv").textContent=hrv||"--";
+  document.getElementById("o-hrv-sub").textContent=hrv<30?"Lower — normal in T1":hrv>60?"Great variability":"Within range";
+  document.getElementById("o-temp").textContent=(temp>0?"+":"")+temp.toFixed(2)+"°";
+  document.getElementById("o-temp-sub").textContent=temp>0.2?"Elevated — positive sign":temp<-0.2?"Slightly low":"Near baseline";
+  document.getElementById("o-sleep").textContent=sleep||"--";
+  document.getElementById("o-sleep-sub").textContent=sleep<70?"Rest — T1 is exhausting":sleep<85?"Good sleep":"Excellent";
+  document.getElementById("o-ready").textContent=ready||"--";
+  document.getElementById("o-ready-sub").textContent=ready<60?"Be gentle today":ready<75?"Moderate energy":"Feeling good";
+  document.getElementById("o-rhr").textContent=rhr||"--";
+  document.getElementById("o-rhr-sub").textContent=rhr>70?"Rising RHR normal in pregnancy":rhr>0?"Within range":"";
+  document.getElementById("o-steps").textContent=steps>999?(Math.round(steps/100)/10)+"k":steps||"--";
+  document.getElementById("o-steps-sub").textContent=steps>7000?"Active day":steps>4000?"Moderate":"Gentle walk today";
+
+  document.getElementById("oura-insight").textContent="Week 5: HRV often dips in first trimester as blood volume increases — don't panic. Rising resting HR is your body adapting beautifully. Sleep and rest are your top priority right now.";
+  document.getElementById("oura-home-row").innerHTML=`<div class="stats-row" style="margin-top:10px;"><div class="stat-card"><div class="stat-val" style="color:var(--oura);">${hrv||"--"}</div><div class="stat-lbl">HRV · Oura</div></div><div class="stat-card"><div class="stat-val" style="color:var(--oura);">${ready||"--"}</div><div class="stat-lbl">Readiness · Oura</div></div></div>`;
+  showToast("Oura data applied ✓");
+}
+
+function renderOuraData(sleep,ready,act,daily){
+  const statusEl=document.getElementById("oura-status");
+  const latest=sleep?.data?.[sleep.data.length-1];
+  const latestReady=ready?.data?.[ready.data.length-1];
+  const latestAct=act?.data?.[act.data.length-1];
+  const latestDaily=daily?.data?.[daily.data.length-1];
+
+  if(!latest&&!latestReady&&!latestAct&&!latestDaily){
+    statusEl.textContent="No data found for today yet — try again after your ring syncs.";
+    return;
+  }
+
+  if(latest){
+    const hrv=Math.round(latest.average_hrv||0);
+    const temp=parseFloat((latest.temperature_deviation||0).toFixed(2));
+    const rhr=Math.round(latest.lowest_heart_rate||0);
+    document.getElementById("o-hrv").textContent=hrv||"--";
+    document.getElementById("o-hrv-sub").textContent=hrv<30?"Lower — normal in first trimester":hrv>60?"Great variability":"Within range";
+    document.getElementById("o-temp").textContent=(temp>0?"+":"")+temp+"°";
+    document.getElementById("o-temp-sub").textContent=temp>0.2?"Elevated — positive sign in early pregnancy":temp<-0.2?"Slightly low":"Near baseline";
+    document.getElementById("o-rhr").textContent=rhr||"--";
+    document.getElementById("o-rhr-sub").textContent=rhr>70?"Rising RHR is normal in pregnancy":rhr>0?"Within range":"";
+  }
+  if(latestDaily){
+    const score=latestDaily.score||0;
+    document.getElementById("o-sleep").textContent=score||"--";
+    document.getElementById("o-sleep-sub").textContent=score<70?"Rest — first trimester is exhausting":score<85?"Good sleep":"Excellent";
+  }
+  if(latestReady){
+    const r=latestReady.score||0;
+    document.getElementById("o-ready").textContent=r||"--";
+    document.getElementById("o-ready-sub").textContent=r<60?"Be gentle today":r<75?"Moderate energy":"Feeling good";
+  }
+  if(latestAct){
+    const steps=latestAct.steps||0;
+    document.getElementById("o-steps").textContent=steps>999?(Math.round(steps/100)/10)+"k":steps||"--";
+    document.getElementById("o-steps-sub").textContent=steps>7000?"Active day":steps>4000?"Moderate":"Take a gentle walk";
+  }
+
+  statusEl.textContent="Updated just now ✓";
+  document.getElementById("oura-insight").textContent="Week 5: Your HRV may be lower than your personal baseline — completely normal as your blood volume starts to increase. A rising resting heart rate is your body adapting beautifully. Prioritise sleep and be gentle with yourself.";
+
+  const hrvVal=document.getElementById("o-hrv").textContent;
+  const readyVal=document.getElementById("o-ready").textContent;
+  document.getElementById("oura-home-row").innerHTML=`<div class="stats-row" style="margin-top:10px;"><div class="stat-card"><div class="stat-val" style="color:var(--oura);">${hrvVal}</div><div class="stat-lbl">HRV · Oura</div></div><div class="stat-card"><div class="stat-val" style="color:var(--oura);">${readyVal}</div><div class="stat-lbl">Readiness · Oura</div></div></div>`;
+}
+
+function buildWeeks(){
+  let lastTri=0;let html="";
+  const labels={1:"First trimester — weeks 1–12",2:"Second trimester — weeks 13–27",3:"Third trimester — weeks 28–40"};
+  weeksData.forEach(w=>{
+    if(w.tri!==lastTri){html+=`<div class="trimester-divider">${labels[w.tri]}</div>`;lastTri=w.tri;}
+    html+=`<div class="week-card${w.cur?" current":""}">
+      <div class="wk-circle">${w.w}</div>
+      <div><div class="wk-title">${w.t}${w.cur?'<span class="you-here">You</span>':''}</div>
+      ${w.s?`<div class="wk-size">${w.s}</div>`:''}
+      <div class="wk-desc">${w.d}</div></div></div>`;
+  });
+  document.getElementById("weeks-list").innerHTML=html;
+}
+
+// Image search cache
+const imgCache={};
+async function getItemImage(query){
+  if(imgCache[query]) return imgCache[query];
+  // Use Unsplash source for product-style images
+  const terms=query.replace(/[^a-z0-9 ]/gi,' ').trim();
+  const url=`https://source.unsplash.com/200x200/?${encodeURIComponent(terms)},product,baby`;
+  imgCache[query]=url;
+  return url;
+}
+
+function buildShop(data,elId,prefix){
+  const saved=loadState(prefix);
+  const el=document.getElementById(elId);
+  el.className="shop-grid";
+  el.innerHTML=data.map((item,i)=>{
+    const bought=saved[i]||false;
+    const imgSrc=`https://source.unsplash.com/200x200/?${encodeURIComponent(item.q+' product')}`;
+    return`<div class="shop-visual-card${bought?' bought':''}" id="svc-${prefix}-${i}" onclick="openShopDetail('${prefix}',${i})">
+      ${bought?'<div class="shop-bought-badge">✓ Bought</div>':''}
+      <div class="shop-img-wrap">
+        <img src="${imgSrc}" alt="${item.l}" loading="lazy" onerror="this.src='https://source.unsplash.com/200x200/?baby,pregnancy'">
+      </div>
+      <div class="shop-card-name">${item.l}</div>
+    </div>`;
+  }).join("");
+}
+
+let currentDetailKey=null;
+let currentDetailPrefix=null;
+let currentDetailIdx=null;
+const allShopData={sq1:shopData.q1,sq2:shopData.q2,sq3:shopData.q3};
+
+function openShopDetail(prefix,i){
+  const data=allShopData[prefix];
+  const item=data[i];
+  const key=prefix+"-"+i;
+  currentDetailKey=key;currentDetailPrefix=prefix;currentDetailIdx=i;
+
+  document.getElementById('detail-title').textContent=item.l;
+  document.getElementById('detail-when').textContent=item.w;
+
+  const imgSrc=`https://source.unsplash.com/400x300/?${encodeURIComponent(item.q+' product')}`;
+  document.getElementById('detail-img').src=imgSrc;
+
+  const descs={
+    "Folic acid 400mcg supplements":"Essential from conception through week 12. Reduces risk of neural tube defects by up to 70%. Take daily, ideally with breakfast.",
+    "Vitamin D 10mcg":"Recommended for all pregnant women in the UK, especially important for bone development and immune function.",
+    "Ginger sweets / sea-bands":"Sea-bands apply pressure to the P6 acupressure point on your wrist. Ginger in any form helps settle nausea. Both are safe throughout pregnancy.",
+    "Soft bras — no underwire":"Your breasts change size rapidly in first trimester. Soft, stretchy bras without underwire are more comfortable and safer as your ribcage expands.",
+    "Pregnancy pillow":"A full-length or C-shaped pillow supports your bump, hips and back as you sleep. Most useful from week 16+.",
+    "Maternity jeans and trousers":"Look for under-bump or over-bump styles. Under-bump is more comfortable earlier; over-bump gives more support later.",
+    "Pregnancy support belt":"Worn around your lower abdomen to support the weight of your bump and relieve back pain. Especially useful weeks 20–36.",
+    "Stretch mark oil or cream":"No cream prevents stretch marks entirely, but keeping skin hydrated reduces itching. Apply morning and evening from week 14.",
+    "Nursing bras":"Get fitted around week 28 when your size stabilises. Buy 2–3. Look for drop-cup clips for easy feeding access.",
+    "Cot or Moses basket":"Moses baskets are portable and perfect for the first 3–4 months. Cots last until age 2–3. You'll need a firm, flat mattress.",
+    "Pram or travel system":"A travel system includes a pram, pushchair and infant car seat that click together. Visit a shop to try before buying.",
+    "Infant car seat":"Group 0+ seats (up to 13kg) are rear-facing and the safest for newborns. Always buy new — never second-hand.",
+    "Baby monitor":"Video monitors give peace of mind. Look for night vision, two-way audio and temperature display.",
+    "Hospital bag":"Pack from week 34. Essentials: notes, nightie, lip balm, snacks, phone charger, baby's first outfit, nappies.",
+    "Newborn nappies and wipes":"Buy 1–2 packs of newborn size — babies grow fast. Water wipes are safest for the first few weeks.",
+    "Sleepsuits x6+ and vests x6+":"All-in-one sleepsuits are easiest for night changes. Buy a mix of newborn and 0–3 month sizes.",
+    "Breast pump":"Electric double pumps are most efficient. Look for the Elvie or Medela Swing. Check if your hospital has pumps to try first.",
+    "Nipple cream — Lansinoh":"Lansinoh is the gold standard. Apply after every feed in the first weeks. Completely safe for baby.",
+    "Muslins x20":"You will use far more than you think. Use for burping, cleaning, swaddling and everything in between.",
+    "Baby bath":"A small plastic baby bath or a bath support that sits in your regular tub. Baby can also be bathed in a clean washing up bowl.",
+    "Changing mat":"A wipe-clean mat is essential. A changing unit at the right height saves your back enormously.",
+    "Bouncy chair":"Lets you put baby down safely while keeping them gently moving. Most babies love gentle vibration.",
+    "Swaddle blankets x3":"Swaddling helps babies feel secure and sleep longer. Muslin swaddles are breathable and gentle.",
+  };
+  document.getElementById('detail-desc').textContent=descs[item.l]||item.l+' — tap Amazon UK or LTK to find the best options.';
+  document.getElementById('detail-amazon').href=`https://www.amazon.co.uk/s?k=${encodeURIComponent(item.q)}`;
+
+  const links=loadLinks();
+  renderDetailLinks(links[key]||[]);
+
+  const bought=loadState(prefix)[i]||false;
+  const btn=document.getElementById('detail-check-btn');
+  btn.textContent=bought?'Mark as not bought':'Mark as bought ✓';
+  btn.style.background=bought?'var(--warm)':'var(--sage)';
+
+  goTo('shop-detail');
+}
+
+function renderDetailLinks(links){
+  const el=document.getElementById('detail-links');
+  if(!links.length){el.innerHTML='<div style="font-size:13px;color:var(--text-muted);font-style:italic;padding:4px 0;">No links saved yet.</div>';return;}
+  el.innerHTML=links.map((lnk,i)=>`<div class="detail-link-pill"><a href="${lnk.url}" target="_blank">${lnk.label}</a><button class="del-btn" onclick="delDetailLink(${i})">×</button></div>`).join("");
+}
+
+function addDetailLink(){
+  const inp=document.getElementById('detail-link-inp');
+  const url=inp.value.trim();if(!url)return;
+  let label=url;try{label=new URL(url).hostname.replace('www.','');}catch(e){}
+  const links=loadLinks();
+  if(!links[currentDetailKey])links[currentDetailKey]=[];
+  links[currentDetailKey].push({url,label});
+  saveLinks(links);inp.value='';
+  renderDetailLinks(links[currentDetailKey]);
+  showToast('Link saved');
+}
+
+function delDetailLink(i){
+  const links=loadLinks();
+  if(links[currentDetailKey])links[currentDetailKey].splice(i,1);
+  saveLinks(links);
+  renderDetailLinks(links[currentDetailKey]||[]);
+}
+
+function toggleDetailCheck(){
+  const state=loadState(currentDetailPrefix);
+  state[currentDetailIdx]=!state[currentDetailIdx];
+  saveState(currentDetailPrefix,state);
+  const bought=state[currentDetailIdx];
+  const btn=document.getElementById('detail-check-btn');
+  btn.textContent=bought?'Mark as not bought':'Mark as bought ✓';
+  btn.style.background=bought?'var(--warm)':'var(--sage)';
+  // refresh card
+  const card=document.getElementById(`svc-${currentDetailPrefix}-${currentDetailIdx}`);
+  if(card){card.classList.toggle('bought',bought);}
+  showToast(bought?'Marked as bought ✓':'Unmarked');
+}
+
+function addLink(key,prefix,i){
+  const inp=document.getElementById("linkinp-"+key);
+  const url=inp.value.trim();if(!url)return;
+  const links=loadLinks();
+  if(!links[key])links[key]=[];
+  let label=url;
+  try{label=new URL(url).hostname.replace("www.","");}catch(e){}
+  links[key].push({url,label});
+  saveLinks(links);inp.value="";
+  const el=document.getElementById("links-"+key);
+  el.innerHTML=links[key].map((lnk,li)=>`<a class="shop-link-pill" href="${lnk.url}" target="_blank"><span>${lnk.label}</span><button class="shop-link-del" onclick="delLink(event,'${key}',${li})">×</button></a>`).join("");
+  showToast("Link saved");
+}
+
+function delLink(e,key,li){
+  e.preventDefault();e.stopPropagation();
+  const links=loadLinks();
+  if(links[key])links[key].splice(li,1);
+  saveLinks(links);
+  const el=document.getElementById("links-"+key);
+  if(el)el.innerHTML=(links[key]||[]).map((lnk,i)=>`<a class="shop-link-pill" href="${lnk.url}" target="_blank"><span>${lnk.label}</span><button class="shop-link-del" onclick="delLink(event,'${key}',${i})">×</button></a>`).join("");
+}
+
+function buildTodos(data,elId,prefix,cls){
+  const saved=loadState(prefix);
+  document.getElementById(elId).innerHTML=data.map((item,i)=>`
+    <div class="${cls||"todo-item"}">
+      <input type="checkbox" ${saved[i]?"checked":""} onchange="saveCheck('${prefix}',${i},this)">
+      <div><div class="${cls==="partner-item"?"partner-text":"todo-text"}${saved[i]?" done":""}" id="${prefix}-lbl-${i}">${item.l}</div>
+      <div class="${cls==="partner-item"?"partner-when":"todo-when"}">${item.w}</div></div>
+    </div>`).join("");
+}
+
+function saveCheck(prefix,i,cb){
+  const lbl=document.getElementById(prefix+"-lbl-"+i);
+  if(cb.checked)lbl.classList.add("done");else lbl.classList.remove("done");
+  const state=loadState(prefix);state[i]=cb.checked;saveState(prefix,state);
+}
+
+function addPartnerTask(){
+  const inp=document.getElementById("partner-custom-inp");const v=inp.value.trim();if(!v)return;
+  partnerCustom.push(v);inp.value="";renderPartnerCustom();showToast("Task added");
+}
+function renderPartnerCustom(){
+  document.getElementById("partner-custom-list").innerHTML=partnerCustom.map((t,i)=>`
+    <div class="card" style="margin-top:8px;display:flex;align-items:center;gap:10px;">
+      <div style="flex:1;font-size:13px;color:var(--text);">${t}</div>
+      <button class="del-btn" onclick="partnerCustom.splice(${i},1);renderPartnerCustom();">×</button>
+    </div>`).join("");
+}
+
+function renderQuestions(){
+  const el=document.getElementById("doc-questions");
+  el.innerHTML=questions.map((q,i)=>`<div class="doc-q"><div class="doc-q-text">${q}</div><button class="del-btn" onclick="questions.splice(${i},1);renderQuestions();">×</button></div>`).join("")||'<div style="font-size:13px;color:var(--text-muted);font-style:italic;padding:8px 0;">No questions yet.</div>';
+}
+function addQuestion(){const inp=document.getElementById("new-question");const v=inp.value.trim();if(!v)return;questions.push(v);inp.value="";renderQuestions();showToast("Question added");}
+
+function saveApptNote(){const inp=document.getElementById("appt-note");const v=inp.value.trim();if(!v)return;const now=new Date();apptNotes.unshift({text:v,date:now.toLocaleDateString("en-GB",{day:"numeric",month:"short",year:"numeric"})});inp.value="";renderApptNotes();showToast("Note saved");}
+function renderApptNotes(){document.getElementById("appt-notes-list").innerHTML=apptNotes.map(n=>`<div class="appt-card"><div class="appt-date">${n.date}</div><div class="appt-text">${n.text}</div></div>`).join("");}
+
+function addWorry(){const inp=document.getElementById("worry-inp");const v=inp.value.trim();if(!v)return;const now=new Date();worries.unshift({text:v,date:now.toLocaleDateString("en-GB",{day:"numeric",month:"short"})});inp.value="";renderWorries();showToast("Worry logged");}
+function renderWorries(){document.getElementById("worry-list").innerHTML=worries.map((w,i)=>`<div class="worry-card"><div><div class="worry-text">${w.text}</div><div class="worry-date">${w.date}</div></div><button class="del-btn" onclick="worries.splice(${i},1);renderWorries();">×</button></div>`).join("");}
+
+function showToast(msg){const t=document.getElementById("toast");t.textContent=msg;t.classList.add("show");setTimeout(()=>t.classList.remove("show"),1800);}
+
+function getNotionKey(){try{return localStorage.getItem("bloom_notion_key")||"";}catch(e){return "";}}
+function saveNotionKey(){try{localStorage.setItem("bloom_notion_key",document.getElementById("notion-key").value);}catch(e){}}
+function saveOuraToken(){try{localStorage.setItem("bloom_oura_token",document.getElementById("oura-token").value);}catch(e){}}
+function loadState(k){try{return JSON.parse(localStorage.getItem("bl_"+k)||"{}");}catch(e){return {};}}
+function saveState(k,v){try{localStorage.setItem("bl_"+k,JSON.stringify(v));}catch(e){}}
+function loadLinks(){try{return JSON.parse(localStorage.getItem("bl_shoplinks")||"{}");}catch(e){return {};}}
+function saveLinks(v){try{localStorage.setItem("bl_shoplinks",JSON.stringify(v));}catch(e){}}
+
+function init(){
+  const now=new Date();
+  document.getElementById("home-date").textContent=now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long",year:"numeric"});
+  document.getElementById("sym-date").textContent="Week 5+2 · "+now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+  document.getElementById("oura-date").textContent=now.toLocaleDateString("en-GB",{weekday:"long",day:"numeric",month:"long"});
+  try{
+    const nk=localStorage.getItem("bloom_notion_key");if(nk)document.getElementById("notion-key").value=nk;
+    const ok=localStorage.getItem("bloom_oura_token");if(ok)document.getElementById("oura-token").value=ok;
+  }catch(e){}
+  const autoTod=getAutoTod();tod=autoTod;
+  document.querySelectorAll("#tod-group .pill-btn").forEach(b=>{if(b.textContent===autoTod)b.classList.add("p-active");});
+  setSev("Mild");
+  buildSymGrid();
+  buildWeeks();
+  buildShop(shopData.q1,"shop-q1","sq1");
+  buildShop(shopData.q2,"shop-q2","sq2");
+  buildShop(shopData.q3,"shop-q3","sq3");
+  buildTodos(todoData.q1,"todo-q1","tq1");
+  buildTodos(todoData.q2,"todo-q2","tq2");
+  buildTodos(todoData.q3,"todo-q3","tq3");
+  buildTodos(partnerData.q1,"partner-q1","pq1","partner-item");
+  buildTodos(partnerData.q2,"partner-q2","pq2","partner-item");
+  buildTodos(partnerData.q3,"partner-q3","pq3","partner-item");
+  renderQuestions();
+}
+init();
+</script>
+</body>
+</html>

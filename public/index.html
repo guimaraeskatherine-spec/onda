@@ -79,26 +79,6 @@ body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);dis
 .qa-label{font-size:12px;font-weight:500;color:var(--text);}
 .qa-sub{font-size:10px;color:var(--text-muted);margin-top:2px;}
 
-/* ======= OURA ======= */
-.oura-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin:0 16px;}
-.oura-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:14px;text-align:center;}
-.oura-val{font-family:'Playfair Display',serif;font-size:26px;color:var(--oura);line-height:1;}
-.oura-lbl{font-size:10px;color:var(--text-muted);margin-top:4px;letter-spacing:0.04em;text-transform:uppercase;}
-.oura-sub{font-size:11px;color:var(--text-mid);margin-top:3px;}
-.oura-bar-wrap{height:5px;background:var(--oura-light);border-radius:999px;overflow:hidden;margin-top:8px;}
-.oura-bar{height:100%;border-radius:999px;background:var(--oura);}
-.oura-trend{display:flex;align-items:center;gap:4px;margin-top:6px;font-size:11px;color:var(--text-muted);}
-.trend-up{color:var(--sage);}
-.trend-down{color:var(--rose);}
-.oura-setup{background:var(--oura-light);border:1px solid rgba(108,99,166,0.2);border-radius:var(--radius-sm);padding:14px;margin:0 16px;}
-.oura-hint{font-size:12px;color:var(--text-mid);line-height:1.6;}
-.oura-hint a{color:var(--oura);text-decoration:none;}
-.oura-hint strong{color:var(--text);}
-.settings-input{width:100%;padding:10px 12px;border:1px solid var(--border-strong);border-radius:var(--radius-sm);font-size:12px;font-family:'Jost',sans-serif;background:var(--white);color:var(--text);outline:none;margin-top:8px;}
-.settings-input:focus{border-color:var(--oura);}
-.oura-fetch-btn{width:100%;margin-top:8px;padding:10px;background:var(--oura);color:var(--white);border:none;border-radius:var(--radius-sm);font-size:13px;font-weight:500;cursor:pointer;font-family:'Jost',sans-serif;}
-.oura-note{font-size:11px;color:var(--text-muted);margin-top:6px;line-height:1.5;}
-
 /* ======= SYMPTOMS ======= */
 .sym-grid{display:grid;grid-template-columns:1fr 1fr;gap:8px;padding:0 16px;}
 .sym-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);padding:12px;cursor:pointer;position:relative;overflow:hidden;transition:transform 0.1s;min-height:68px;display:flex;flex-direction:column;gap:4px;}
@@ -206,13 +186,26 @@ body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);dis
 .wk-size{font-size:11px;color:var(--warm);margin-top:2px;font-style:italic;}
 .wk-desc{font-size:12px;color:var(--text-muted);margin-top:4px;line-height:1.5;}
 .you-here{display:inline-block;font-size:10px;font-weight:500;padding:2px 8px;border-radius:999px;background:var(--blush);color:var(--white);margin-left:6px;vertical-align:middle;}
+
+/* ======= SHOPPING VISUAL GRID ======= */
+.shop-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;padding:0 16px;}
+.shop-visual-card{background:var(--white);border:1px solid var(--border);border-radius:var(--radius-sm);cursor:pointer;overflow:hidden;transition:transform 0.1s;position:relative;}
+.shop-visual-card:active{transform:scale(0.97);}
+.shop-visual-card.bought{opacity:0.5;}
+.shop-img-wrap{width:100%;height:110px;background:var(--cream-mid);display:flex;align-items:center;justify-content:center;overflow:hidden;}
+.shop-img-wrap img{width:100%;height:110px;object-fit:contain;padding:10px;}
+.shop-card-name{font-size:12px;font-weight:500;color:var(--text);padding:8px 10px 10px;line-height:1.3;}
+.shop-bought-badge{position:absolute;top:6px;right:6px;background:var(--sage);color:white;font-size:9px;font-weight:500;padding:2px 6px;border-radius:999px;}
+.detail-link-pill{display:flex;align-items:center;gap:8px;padding:8px 0;border-bottom:1px solid var(--border);}
+.detail-link-pill:last-child{border-bottom:none;}
+.detail-link-pill a{flex:1;font-size:13px;color:var(--blush-dark);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;}
 </style>
 </head>
 <body>
 
 <!-- HOME -->
 <div class="screen active" id="screen-home">
-  <div class="page-header"><h1>onda <em>mama</em></h1><p id="home-date"></p></div>
+  <div class="page-header"><h1>onda</h1><p id="home-date"></p></div>
   <div style="padding-bottom:8px;">
     <div class="home-hero">
       <div class="home-hero-title">Week <em>5+2</em></div>
@@ -230,11 +223,11 @@ body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);dis
       <div class="prog-bar-outer"><div class="prog-bar-inner" style="width:13%"></div></div>
       <div style="font-size:12px;color:var(--text-muted);margin-top:10px;line-height:1.6;">Your baby is the size of a <strong style="color:var(--warm);">sesame seed</strong> — about 2mm. The heart is beginning to form and will start beating around week 6. The neural tube — brain and spinal cord — is developing rapidly.</div>
     </div>
-    <div id="oura-home-row"></div>
+    
     <div class="slabel">Quick actions</div>
     <div class="quick-grid">
       <button class="qa-btn" onclick="goTo('symptoms')"><span class="qa-icon">🌿</span><div class="qa-label">Log symptom</div><div class="qa-sub">One tap · Notion sync</div></button>
-      <button class="qa-btn" onclick="goTo('oura')"><span class="qa-icon">💍</span><div class="qa-label">Oura today</div><div class="qa-sub">HRV · temp · sleep</div></button>
+      <button class="qa-btn" onclick="goTo('weeks')"><span class="qa-icon">🌱</span><div class="qa-label">Baby's week</div><div class="qa-sub">Development · size</div></button>
       <button class="qa-btn" onclick="goTo('shopping')"><span class="qa-icon">🛒</span><div class="qa-label">Shopping</div><div class="qa-sub">Links · wishlist</div></button>
       <button class="qa-btn" onclick="goTo('doctor')"><span class="qa-icon">💬</span><div class="qa-label">Notes</div><div class="qa-sub">Doctor · worries</div></button>
     </div>
@@ -277,45 +270,6 @@ body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);dis
   </div>
 </div>
 
-<!-- OURA -->
-<div class="screen" id="screen-oura">
-  <div class="page-header"><h1>oura <em>today</em></h1><p id="oura-date"></p></div>
-  <div style="padding-bottom:8px;">
-    <div class="slabel">Your data</div>
-    <div class="oura-grid" id="oura-grid">
-      <div class="oura-card"><div class="oura-val" id="o-hrv">--</div><div class="oura-lbl">HRV (ms)</div><div class="oura-sub" id="o-hrv-sub">--</div></div>
-      <div class="oura-card"><div class="oura-val" id="o-temp">--</div><div class="oura-lbl">Temp deviation</div><div class="oura-sub" id="o-temp-sub">--</div></div>
-      <div class="oura-card"><div class="oura-val" id="o-sleep">--</div><div class="oura-lbl">Sleep score</div><div class="oura-sub" id="o-sleep-sub">--</div></div>
-      <div class="oura-card"><div class="oura-val" id="o-ready">--</div><div class="oura-lbl">Readiness</div><div class="oura-sub" id="o-ready-sub">--</div></div>
-      <div class="oura-card"><div class="oura-val" id="o-rhr">--</div><div class="oura-lbl">Resting HR</div><div class="oura-sub" id="o-rhr-sub">--</div></div>
-      <div class="oura-card"><div class="oura-val" id="o-steps">--</div><div class="oura-lbl">Steps</div><div class="oura-sub" id="o-steps-sub">--</div></div>
-    </div>
-    <div class="slabel" style="padding-top:12px;">Pregnancy context</div>
-    <div class="card" style="margin-top:0;">
-      <div style="font-size:12px;color:var(--text-muted);line-height:1.7;" id="oura-insight">Connect your Oura Ring to see personalised insights for pregnancy week 5.</div>
-    </div>
-    <div class="slabel" style="padding-top:12px;">Connect Oura Ring</div>
-    <div class="oura-setup">
-      <div class="oura-hint">
-        Paste your Oura token below and tap <strong>Fetch</strong> — your data loads automatically. 🌊<br><br>
-        Get your token at <a href="https://cloud.ouraring.com/personal-access-tokens" target="_blank">cloud.ouraring.com/personal-access-tokens</a> → Create New Personal Access Token.
-      </div>
-      <input class="settings-input" id="oura-token" type="password" placeholder="Paste Oura token here..." oninput="saveOuraToken()">
-      <button class="oura-fetch-btn" onclick="fetchOura()" style="margin-top:8px;">Fetch today's data</button>
-      <div class="oura-note" id="oura-status" style="margin-top:6px;"></div>
-    </div>
-    <div class="slabel" style="padding-top:12px;">Why this matters in pregnancy</div>
-    <div class="card" style="margin-top:0;">
-      <div style="font-size:12px;color:var(--text-muted);line-height:1.7;">
-        <strong style="color:var(--text);">Temperature</strong> — rises slightly after ovulation and can stay elevated in early pregnancy. A persistent 0.2–0.5°C rise above your baseline is a positive sign.<br><br>
-        <strong style="color:var(--text);">HRV</strong> — heart rate variability often drops in the first trimester as your body adapts to increased blood volume. Don't panic if it's lower than usual.<br><br>
-        <strong style="color:var(--text);">Resting heart rate</strong> — typically rises 10–20 bpm during pregnancy as your heart pumps more blood.<br><br>
-        <strong style="color:var(--text);">Sleep</strong> — disrupted sleep is very normal, especially weeks 6–10. Your readiness score will naturally dip — be kind to yourself.
-      </div>
-    </div>
-  </div>
-</div>
-
 <!-- WEEKS -->
 <div class="screen" id="screen-weeks">
   <div class="page-header"><h1>week by <em>week</em></h1><p>Baby development · due 27 Dec 2026</p></div>
@@ -324,14 +278,48 @@ body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);dis
 
 <!-- SHOPPING -->
 <div class="screen" id="screen-shopping">
-  <div class="page-header"><h1>shopping <em>list</em></h1><p>Tap + to add links · compare before buying</p></div>
+  <div class="page-header"><h1>shopping <em>list</em></h1><p>Tap an item to see details and add links</p></div>
   <div style="padding-bottom:8px;">
     <div class="slabel">Buy now — first trimester</div>
-    <div class="card" style="margin-top:0;padding:12px 16px;"><div id="shop-q1"></div></div>
+    <div id="shop-q1"></div>
     <div class="slabel">Second trimester (weeks 13–27)</div>
-    <div class="card" style="margin-top:0;padding:12px 16px;"><div id="shop-q2"></div></div>
+    <div id="shop-q2"></div>
     <div class="slabel">Third trimester (weeks 28–40)</div>
-    <div class="card" style="margin-top:0;padding:12px 16px;"><div id="shop-q3"></div></div>
+    <div id="shop-q3"></div>
+  </div>
+</div>
+
+<!-- SHOPPING DETAIL VIEW -->
+<div class="screen" id="screen-shop-detail">
+  <div class="page-header" style="padding-top:44px;">
+    <button onclick="goTo('shopping')" style="background:none;border:none;font-size:13px;color:var(--blush-dark);cursor:pointer;padding:0;font-family:'Jost',sans-serif;margin-bottom:8px;">← Back to list</button>
+    <h1 id="detail-title" style="font-size:20px;"></h1>
+    <p id="detail-when"></p>
+  </div>
+  <div style="padding-bottom:8px;">
+    <div style="margin:12px 16px 0;border-radius:var(--radius);overflow:hidden;background:var(--cream-mid);height:200px;display:flex;align-items:center;justify-content:center;" id="detail-img-wrap">
+      <img id="detail-img" style="width:100%;height:200px;object-fit:contain;padding:16px;" src="" alt="">
+    </div>
+    <div class="card" style="margin-top:10px;" id="detail-desc-card">
+      <div style="font-size:13px;color:var(--text-muted);line-height:1.6;" id="detail-desc"></div>
+    </div>
+    <div class="slabel" style="padding-top:12px;">Search for this item</div>
+    <div style="display:flex;gap:8px;padding:0 16px;">
+      <a id="detail-amazon" class="search-btn" href="#" target="_blank" style="flex:1;text-align:center;padding:10px;">🛒 Amazon UK</a>
+      <a class="search-btn ltk-btn" href="https://www.shopltk.com/explore/molliecampsie/productsets/11f1205d55966cce91110242ac110024" target="_blank" style="flex:1;text-align:center;padding:10px;">🩷 LTK picks</a>
+    </div>
+    <div class="slabel" style="padding-top:12px;">My saved links</div>
+    <div class="card" style="margin-top:0;">
+      <div id="detail-links"></div>
+      <div style="display:flex;gap:8px;margin-top:10px;">
+        <input class="line-input" id="detail-link-inp" placeholder="Paste a link to save..." style="flex:1;">
+        <button class="add-btn" onclick="addDetailLink()" style="padding:10px 14px;">Save</button>
+      </div>
+    </div>
+    <div class="slabel" style="padding-top:12px;">Mark as</div>
+    <div style="display:flex;gap:8px;padding:0 16px;">
+      <button class="add-btn" onclick="toggleDetailCheck()" id="detail-check-btn" style="flex:1;background:var(--sage);border:none;">Mark as bought</button>
+    </div>
   </div>
 </div>
 
@@ -431,7 +419,7 @@ body{font-family:'Jost',sans-serif;background:var(--cream);color:var(--text);dis
 <nav class="nav">
   <button class="nav-btn active" id="nav-home" onclick="goTo('home')"><div class="nav-icon">🏠</div><div class="nav-label">Home</div></button>
   <button class="nav-btn" id="nav-symptoms" onclick="goTo('symptoms')"><div class="nav-icon">🌿</div><div class="nav-label">Symptoms</div></button>
-  <button class="nav-btn" id="nav-oura" onclick="goTo('oura')"><div class="nav-icon">💍</div><div class="nav-label">Oura</div></button>
+  
   <button class="nav-btn" id="nav-weeks" onclick="goTo('weeks')"><div class="nav-icon">🌱</div><div class="nav-label">Weeks</div></button>
   <button class="nav-btn" id="nav-shopping" onclick="goTo('shopping')"><div class="nav-icon">🛒</div><div class="nav-label">Shopping</div></button>
   <button class="nav-btn" id="nav-todos" onclick="goTo('todos')"><div class="nav-icon">✓</div><div class="nav-label">To-dos</div></button>
@@ -581,10 +569,10 @@ let shopLinks={};
 function goTo(s){
   document.querySelectorAll(".screen").forEach(x=>x.classList.remove("active"));
   document.querySelectorAll(".nav-btn").forEach(x=>x.classList.remove("active"));
-  document.getElementById("screen-"+s).classList.add("active");
+  const el=document.getElementById("screen-"+s);
+  if(el){el.classList.add("active");el.scrollTop=0;}
   const nb=document.getElementById("nav-"+s);
   if(nb) nb.classList.add("active");
-  document.getElementById("screen-"+s).scrollTop=0;
 }
 
 function getAutoTod(){const h=new Date().getHours();if(h>=5&&h<12)return"Morning";if(h>=12&&h<17)return"Afternoon";if(h>=17&&h<21)return"Evening";return"Night";}
@@ -883,31 +871,127 @@ function buildWeeks(){
   document.getElementById("weeks-list").innerHTML=html;
 }
 
+// Image search cache
+const imgCache={};
+async function getItemImage(query){
+  if(imgCache[query]) return imgCache[query];
+  // Use Unsplash source for product-style images
+  const terms=query.replace(/[^a-z0-9 ]/gi,' ').trim();
+  const url=`https://source.unsplash.com/200x200/?${encodeURIComponent(terms)},product,baby`;
+  imgCache[query]=url;
+  return url;
+}
+
 function buildShop(data,elId,prefix){
-  const links=loadLinks();
-  document.getElementById(elId).innerHTML=data.map((item,i)=>{
-    const key=prefix+"-"+i;
-    const itemLinks=links[key]||[];
-    return`<div class="shop-item">
-      <div class="shop-top">
-        <input type="checkbox" ${loadState(prefix)[i]?"checked":""} onchange="saveCheck('${prefix}',${i},this)">
-        <div>
-          <div class="shop-label${loadState(prefix)[i]?" done":""}" id="${prefix}-lbl-${i}">${item.l}</div>
-          <div class="shop-when">${item.w}</div>
-        </div>
+  const saved=loadState(prefix);
+  const el=document.getElementById(elId);
+  el.className="shop-grid";
+  el.innerHTML=data.map((item,i)=>{
+    const bought=saved[i]||false;
+    const imgSrc=`https://source.unsplash.com/200x200/?${encodeURIComponent(item.q+' product')}`;
+    return`<div class="shop-visual-card${bought?' bought':''}" id="svc-${prefix}-${i}" onclick="openShopDetail('${prefix}',${i})">
+      ${bought?'<div class="shop-bought-badge">✓ Bought</div>':''}
+      <div class="shop-img-wrap">
+        <img src="${imgSrc}" alt="${item.l}" loading="lazy" onerror="this.src='https://source.unsplash.com/200x200/?baby,pregnancy'">
       </div>
-      <div class="shop-search-row">
-        <a class="search-btn" href="https://www.amazon.co.uk/s?k=${encodeURIComponent(item.q)}" target="_blank">🛒 Amazon UK</a>
-        <a class="search-btn ltk-btn" href="https://www.shopltk.com/explore/molliecampsie/productsets/11f1205d55966cce91110242ac110024" target="_blank">🩷 LTK picks</a>
-        <a class="search-btn" href="https://www.google.com/search?q=${encodeURIComponent(item.l+" uk buy")}" target="_blank">🔍 Google</a>
-      </div>
-      <div class="shop-links" id="links-${key}">${itemLinks.map((lnk,li)=>`<a class="shop-link-pill" href="${lnk.url}" target="_blank"><span>${lnk.label}</span><button class="shop-link-del" onclick="delLink(event,'${key}',${li})">×</button></a>`).join("")}</div>
-      <div class="add-link-row">
-        <input class="add-link-inp" id="linkinp-${key}" placeholder="Paste a link to save...">
-        <button class="add-link-btn" onclick="addLink('${key}','${prefix}',${i})">Save link</button>
-      </div>
+      <div class="shop-card-name">${item.l}</div>
     </div>`;
   }).join("");
+}
+
+let currentDetailKey=null;
+let currentDetailPrefix=null;
+let currentDetailIdx=null;
+const allShopData={sq1:shopData.q1,sq2:shopData.q2,sq3:shopData.q3};
+
+function openShopDetail(prefix,i){
+  const data=allShopData[prefix];
+  const item=data[i];
+  const key=prefix+"-"+i;
+  currentDetailKey=key;currentDetailPrefix=prefix;currentDetailIdx=i;
+
+  document.getElementById('detail-title').textContent=item.l;
+  document.getElementById('detail-when').textContent=item.w;
+
+  const imgSrc=`https://source.unsplash.com/400x300/?${encodeURIComponent(item.q+' product')}`;
+  document.getElementById('detail-img').src=imgSrc;
+
+  const descs={
+    "Folic acid 400mcg supplements":"Essential from conception through week 12. Reduces risk of neural tube defects by up to 70%. Take daily, ideally with breakfast.",
+    "Vitamin D 10mcg":"Recommended for all pregnant women in the UK, especially important for bone development and immune function.",
+    "Ginger sweets / sea-bands":"Sea-bands apply pressure to the P6 acupressure point on your wrist. Ginger in any form helps settle nausea. Both are safe throughout pregnancy.",
+    "Soft bras — no underwire":"Your breasts change size rapidly in first trimester. Soft, stretchy bras without underwire are more comfortable and safer as your ribcage expands.",
+    "Pregnancy pillow":"A full-length or C-shaped pillow supports your bump, hips and back as you sleep. Most useful from week 16+.",
+    "Maternity jeans and trousers":"Look for under-bump or over-bump styles. Under-bump is more comfortable earlier; over-bump gives more support later.",
+    "Pregnancy support belt":"Worn around your lower abdomen to support the weight of your bump and relieve back pain. Especially useful weeks 20–36.",
+    "Stretch mark oil or cream":"No cream prevents stretch marks entirely, but keeping skin hydrated reduces itching. Apply morning and evening from week 14.",
+    "Nursing bras":"Get fitted around week 28 when your size stabilises. Buy 2–3. Look for drop-cup clips for easy feeding access.",
+    "Cot or Moses basket":"Moses baskets are portable and perfect for the first 3–4 months. Cots last until age 2–3. You'll need a firm, flat mattress.",
+    "Pram or travel system":"A travel system includes a pram, pushchair and infant car seat that click together. Visit a shop to try before buying.",
+    "Infant car seat":"Group 0+ seats (up to 13kg) are rear-facing and the safest for newborns. Always buy new — never second-hand.",
+    "Baby monitor":"Video monitors give peace of mind. Look for night vision, two-way audio and temperature display.",
+    "Hospital bag":"Pack from week 34. Essentials: notes, nightie, lip balm, snacks, phone charger, baby's first outfit, nappies.",
+    "Newborn nappies and wipes":"Buy 1–2 packs of newborn size — babies grow fast. Water wipes are safest for the first few weeks.",
+    "Sleepsuits x6+ and vests x6+":"All-in-one sleepsuits are easiest for night changes. Buy a mix of newborn and 0–3 month sizes.",
+    "Breast pump":"Electric double pumps are most efficient. Look for the Elvie or Medela Swing. Check if your hospital has pumps to try first.",
+    "Nipple cream — Lansinoh":"Lansinoh is the gold standard. Apply after every feed in the first weeks. Completely safe for baby.",
+    "Muslins x20":"You will use far more than you think. Use for burping, cleaning, swaddling and everything in between.",
+    "Baby bath":"A small plastic baby bath or a bath support that sits in your regular tub. Baby can also be bathed in a clean washing up bowl.",
+    "Changing mat":"A wipe-clean mat is essential. A changing unit at the right height saves your back enormously.",
+    "Bouncy chair":"Lets you put baby down safely while keeping them gently moving. Most babies love gentle vibration.",
+    "Swaddle blankets x3":"Swaddling helps babies feel secure and sleep longer. Muslin swaddles are breathable and gentle.",
+  };
+  document.getElementById('detail-desc').textContent=descs[item.l]||item.l+' — tap Amazon UK or LTK to find the best options.';
+  document.getElementById('detail-amazon').href=`https://www.amazon.co.uk/s?k=${encodeURIComponent(item.q)}`;
+
+  const links=loadLinks();
+  renderDetailLinks(links[key]||[]);
+
+  const bought=loadState(prefix)[i]||false;
+  const btn=document.getElementById('detail-check-btn');
+  btn.textContent=bought?'Mark as not bought':'Mark as bought ✓';
+  btn.style.background=bought?'var(--warm)':'var(--sage)';
+
+  goTo('shop-detail');
+}
+
+function renderDetailLinks(links){
+  const el=document.getElementById('detail-links');
+  if(!links.length){el.innerHTML='<div style="font-size:13px;color:var(--text-muted);font-style:italic;padding:4px 0;">No links saved yet.</div>';return;}
+  el.innerHTML=links.map((lnk,i)=>`<div class="detail-link-pill"><a href="${lnk.url}" target="_blank">${lnk.label}</a><button class="del-btn" onclick="delDetailLink(${i})">×</button></div>`).join("");
+}
+
+function addDetailLink(){
+  const inp=document.getElementById('detail-link-inp');
+  const url=inp.value.trim();if(!url)return;
+  let label=url;try{label=new URL(url).hostname.replace('www.','');}catch(e){}
+  const links=loadLinks();
+  if(!links[currentDetailKey])links[currentDetailKey]=[];
+  links[currentDetailKey].push({url,label});
+  saveLinks(links);inp.value='';
+  renderDetailLinks(links[currentDetailKey]);
+  showToast('Link saved');
+}
+
+function delDetailLink(i){
+  const links=loadLinks();
+  if(links[currentDetailKey])links[currentDetailKey].splice(i,1);
+  saveLinks(links);
+  renderDetailLinks(links[currentDetailKey]||[]);
+}
+
+function toggleDetailCheck(){
+  const state=loadState(currentDetailPrefix);
+  state[currentDetailIdx]=!state[currentDetailIdx];
+  saveState(currentDetailPrefix,state);
+  const bought=state[currentDetailIdx];
+  const btn=document.getElementById('detail-check-btn');
+  btn.textContent=bought?'Mark as not bought':'Mark as bought ✓';
+  btn.style.background=bought?'var(--warm)':'var(--sage)';
+  // refresh card
+  const card=document.getElementById(`svc-${currentDetailPrefix}-${currentDetailIdx}`);
+  if(card){card.classList.toggle('bought',bought);}
+  showToast(bought?'Marked as bought ✓':'Unmarked');
 }
 
 function addLink(key,prefix,i){
